@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
+    "target": "es6",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "outDir": "./dist/",
+    "typeRoots": ["./", "./node_modules/@types"],
+    "types": []
+  },
+  "files": ["index.d.ts", "weapp-tests.ts"],
+  "exclude": ["node_modules"]
+}
