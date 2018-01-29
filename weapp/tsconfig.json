@@ -11,6 +11,6 @@
     "typeRoots": ["./", "./node_modules/@types"],
     "types": []
   },
-  "files": ["index.d.ts", "weapp-tests.ts"],
+  "files": ["index.d.ts", "page.d.ts", "weapp-tests.ts"],
   "exclude": ["node_modules"]
 }
