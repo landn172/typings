@@ -1,198 +1,29 @@
 // Definitions by: landn172 <https://github.com/landn172>
 
-declare type AppShowOptions = {
-	/**
-	 * 打开小程序的路径
-	 * @type {string}
-	 */
-	path: string;
-	/**
-	 * 打开小程序的query
-	 *
-	 * @type {object}
-	 */
-	query: object;
-	/**
-	 * 打开小程序的场景值
-	 *
-	 * @type {number}
-	 */
-	scene: number;
-	/**
-	 * shareTicket，详见:
-	 * https://mp.weixin.qq.com/debug/wxadoc/dev/api/share.html#%E8%8E%B7%E5%8F%96%E6%9B%B4%E5%A4%9A%E8%BD%AC%E5%8F%91%E4%BF%A1%E6%81%AF
-	 * @type {string}
-	 */
-	shareTicket: string;
-	/**
-	 * 当场景为由从另一个小程序或公众号或App打开时
-	 */
-	referrerInfo?: {
-		/**
-		 * 来源小程序或公众号或App的 appId
-		 *
-		 * @type {string}
-		 */
-		appId: string;
-		/**
-		 * 来源小程序传过来的数据
-		 * scene=1037或1038等时支持，具体详见文档
-		 * @type {object}
-		 */
-		extraData: object;
-	};
-};
-
-/**
- * App 实现的接口对象
- */
-declare interface IApp {
-	[key: string]: any;
-
-	/**
-	 * 生命周期函数--监听小程序初始化。当小程序初始化完成时，会触发 onLaunch（全局只触发一次）
-	 */
-	onLaunch?: (opts: AppShowOptions) => void;
-
-	/**
-	 * 生命周期函数--监听小程序显示。当小程序启动，或从后台进入前台显示，会触发 onShow
-	 */
-	onShow?: (opts: AppShowOptions) => void;
-
-	/**
-	 * 生命周期函数--监听小程序隐藏。当小程序从前台进入后台，会触发 onHide
-	 */
-	onHide?: () => void;
-
-	/**
-	 * 错误监听函数--当小程序发生脚本错误，或者 api 调用失败时，会触发 onError 并带上错误信息
-	 */
-	onError?: (msg: string) => void;
-}
-
-/**
- * App() 函数用来注册一个小程序。接受一个 object 参数，其指定小程序的生命周期函数等。
- */
-declare function App(app: IApp): void;
-
-/**
- * 获取小程序实例
- */
-declare function getApp(): IApp;
-
-/**
- * callback回掉函数
- */
-declare type BaseCallback = (res: any) => void;
-
-
-/**
- * Page 实现的接口对象
- */
-declare interface IPage extends wx.IData {
-	/**
-	 * 开发者可以添加任意的函数或数据到 object 参数中，
-	 * 在页面的函数中用 this 可以访问
-	 */
-	[key: string]: any;
-
-	/**
-	 * [read-only]页面的初始数据,元素是可以转成JSON的格式,字符串，数字，布尔值，对象，数组
-	 */
-	data?: wx.IData;
-
-	/**
-	 * 生命周期函数--监听页面加载
-	 * @param options 接收页面参数可以获取wx.navigateTo和wx.redirectTo及<navigator/>中的 query
-	 */
-	onLoad?: (options?: wx.IData) => void;
-
-	/**
-	 * 生命周期函数--监听页面初次渲染完成
-	 */
-	onReady?: () => void;
-
-	/**
-	 * 生命周期函数--监听页面显示
-	 */
-	onShow?: () => void;
-
-	/**
-	 * 生命周期函数--监听页面隐藏
-	 */
-	onHide?: () => void;
-
-	/**
-	 * 生命周期函数--监听页面卸载
-	 */
-	onUnload?: () => void;
-
-	/**
-	 * 页面相关事件处理函数--监听用户下拉动作
-	 */
-	onPullDownRefresh?: () => void;
-
-	/**
-	 * 页面上拉触底事件的处理函数
-	 */
-	onReachBottom?: () => void;
-	/**
-	 * 用户点击右上角转发，或者<button open-type='share'></button>
-	 * @returns {wx.ShareOptions}
-	 */
-	onShareAppMessage?: () => wx.ShareOptions;
-
-	/**
-	 * 将数据从逻辑层发送到视图层，同时改变对应的 this.data 的值
-	 */
-	readonly setData: (data: wx.IData, callback: BaseCallback) => void;
-
-	/**
-	 * 页面滚动触发事件的处理函数
-	 * @param {{scrollTop: number}} 页面在垂直方向已滚动的距离（单位px）
-	 */
-	onPageScroll?: (param: { scrollTop: number }) => void;
-
-	/**
-	 * 当前是 tab 页时，点击 tab 时触发
-	 */
-	onTabItemTap?: () => void;
-
-	/**
-	 * 获取到当前页面的路径
-	 * @version 1.2.0
-	 */
-	readonly route?: string;
-}
-
-/**
- * Page() 函数用来注册一个页面。
- * 接受一个 object 参数，其指定页面的初始数据、生命周期函数、事件处理函数等。
- */
-declare function Page(page: IPage): void;
-
-/**
- * getCurrentPages() 函数用于获取当前页面栈的实例，
- * 以数组形式按栈的顺序给出，第一个元素为首页，最后一个元素为当前页面。
- */
-declare function getCurrentPages(): IPage[];
+/// <reference path="./page.d.ts" />
+/// <reference path="./app.d.ts" />
 
 declare namespace wx {
+	/**
+	 * callback回掉函数
+	 */
+	export type BaseCallback = (res: any) => void;
+
 	export interface BaseOptions {
 		/**
 		 * 接口调用成功的回调函数
 		 */
-		success?: (res: any) => void;
+		success?: BaseCallback;
 
 		/**
 		 * 接口调用失败的回调函数
 		 */
-		fail?: (res: any) => void;
+		fail?: BaseCallback;
 
 		/**
 		 * 接口调用结束的回调函数（调用成功、失败都会执行）
 		 */
-		complete?: (res: any) => void;
+		complete?: BaseCallback;
 	}
 
 	export interface SuccessOptions extends BaseOptions {
