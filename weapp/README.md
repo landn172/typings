@@ -22,7 +22,16 @@
 
 ## 使用说明
 
-1. 参考 [src/weapp-test.ts](./src/weapp-test.ts)使用示例
+1. 参考 [src/weapp-test.ts](https://github.com/landn172/typings/blob/master/weapp/weapp-tests.ts)使用示例
+
+Page 中实际案例
+
+```ts
+interface MyPage extends IPage {}
+class MyPage implements IPageClass {
+  // ....
+}
+```
 
 2. tsconfig 配置
 
