@@ -4,6 +4,76 @@
 /// <reference path="./app.d.ts" />
 
 declare namespace wx {
+  interface IEventTarget {
+    /**
+     * 事件源组件的id
+     */
+    id: string;
+    /**
+     * 当前组件的类型
+     */
+    tagName: string;
+    /**
+     * 事件源组件上由data-开头的自定义属性组成的集合
+     */
+    dataset: wx.IData;
+  }
+
+  interface IEventTouch {
+    clientX: number;
+    clientY: number;
+    identifier: number;
+    pageX: number;
+    pageY: number;
+  }
+
+  interface IEventCanvasTouch {
+    identifier: number;
+    x: number;
+    y: number;
+  }
+
+  /**
+   * base事件参数
+   */
+  interface IBaseEvent {
+    /**
+     * 事件类型
+     */
+    type: string;
+    timeStamp: number;
+    target: IEventTarget;
+    currentTarget: IEventTarget;
+  }
+
+  interface ICustomEvent<P extends wx.IData = wx.IData> extends IBaseEvent {
+    /**
+     * 额外的信息
+     */
+    detail: P;
+  }
+
+  /**
+   * 触摸事件返回
+   */
+  export interface ITouchEvent<
+    P extends wx.IData = wx.IData,
+    T extends IEventTouch = IEventTouch
+  > extends ICustomEvent<P> {
+    touches: T[];
+    changedTouches: T[];
+  }
+
+  /**
+   * canvas触摸事件返回
+   */
+  export interface ICanvasTouchEvent<
+    T extends IEventCanvasTouch = IEventCanvasTouch
+  > extends IBaseEvent {
+    touches: T[];
+    changedTouches: T[];
+  }
+
   /**
    * callback回掉函数
    */
@@ -31,7 +101,11 @@ declare namespace wx {
      * 接口调用成功的回调函数
      * @param {{errMsg: string}} res
      */
-    success?: (res: { errMsg: string }) => void;
+    success?: (
+      res: {
+        errMsg: string;
+      }
+    ) => void;
   }
 
   export interface ShareOptions {
@@ -70,7 +144,7 @@ declare namespace wx {
      * 开发者服务器返回的 HTTP Response Header
      * @version 1.2.0
      */
-    header: IData
+    header: IData;
   }
 
   export interface RequestOptions extends BaseOptions {
@@ -92,7 +166,15 @@ declare namespace wx {
     /**
      * （需大写）有效值：OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
      */
-    methods?: 'OPTIONS' | 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'TRACE' | 'CONNECT';
+    methods?:
+      | 'OPTIONS'
+      | 'GET'
+      | 'HEAD'
+      | 'POST'
+      | 'PUT'
+      | 'DELETE'
+      | 'TRACE'
+      | 'CONNECT';
 
     /**
      * 默认为 json。如果设置了 dataType 为 json，则会尝试对响应的数据做一次 JSON.parse
@@ -116,7 +198,7 @@ declare namespace wx {
    * @version 1.4.0
    */
   export interface requestTask {
-    abort?: () => void
+    abort?: () => void;
   }
 
   /**
@@ -141,7 +223,9 @@ declare namespace wx {
    * @version 1.4.0
    */
   export interface uploadTask {
-    onProgressUpdate?: (callback: (res: onProgressUpdateResult) => void) => void;
+    onProgressUpdate?: (
+      callback: (res: onProgressUpdateResult) => void
+    ) => void;
     abort?: () => void;
   }
 
@@ -149,9 +233,7 @@ declare namespace wx {
    * 返回一个 downloadTask 对象，通过 downloadTask，可监听上传进度变化事件，以及取消上传任务。
    * @version 1.4.0
    */
-  export interface downloadTask extends uploadTask {
-
-  }
+  export interface downloadTask extends uploadTask {}
 
   /**
    * 进度变化
@@ -246,7 +328,9 @@ declare namespace wx {
    * 下载文件资源到本地。
    * 客户端直接发起一个 HTTP GET 请求，返回文件的本地临时路径。
    */
-  export function downloadFile(options: DownloadFileOptions): downloadTask | void;
+  export function downloadFile(
+    options: DownloadFileOptions
+  ): downloadTask | void;
 
   export interface ConnectSocketOptions extends BaseOptions {
     /**
@@ -267,13 +351,21 @@ declare namespace wx {
     /**
      * 默认是GET，有效值为： OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
      */
-    methods?: 'OPTIONS' | 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'TRACE' | 'CONNECT';
+    methods?:
+      | 'OPTIONS'
+      | 'GET'
+      | 'HEAD'
+      | 'POST'
+      | 'PUT'
+      | 'DELETE'
+      | 'TRACE'
+      | 'CONNECT';
 
     /**
      * 子协议数组
      * @version 1.4.0
      */
-    protocols?: string[]
+    protocols?: string[];
   }
 
   /**
@@ -304,10 +396,17 @@ declare namespace wx {
     /**
      * 监听 WebSocket 连接打开事件。
      */
-    onError?: (res: { errMsg: string }) => void;
+    onError?: (
+      res: {
+        errMsg: string;
+      }
+    ) => void;
 
-    onMessage?: (data: { errMsg: string | ArrayBuffer }) => void;
-
+    onMessage?: (
+      data: {
+        errMsg: string | ArrayBuffer;
+      }
+    ) => void;
   }
 
   /**
@@ -349,7 +448,9 @@ declare namespace wx {
   /**
    * 监听WebSocket接受到服务器的消息事件。
    */
-  export function onSocketMessage(callback: (res: SocketMessageResponse) => void): void;
+  export function onSocketMessage(
+    callback: (res: SocketMessageResponse) => void
+  ): void;
 
   /**
    *
@@ -364,7 +465,7 @@ declare namespace wx {
      * 一个可读的字符串，表示连接被关闭的原因。这个字符串必须是不长于123字节的UTF-8 文本（不是字符）
      * @version 1.4.0
      */
-    reason?: string
+    reason?: string;
   }
 
   /**
@@ -380,7 +481,7 @@ declare namespace wx {
     /**
      * 需要发送的内容
      */
-    data: string | ArrayBuffer
+    data: string | ArrayBuffer;
   }
 
   /**
@@ -521,7 +622,9 @@ declare namespace wx {
    * 保存图片到系统相册。需要用户授权 scope.writePhotosAlbum
    * @version 1.2.0
    */
-  export function saveImageToPhotosAlbum(options: SaveImageToPhotosAlbumOptions): void;
+  export function saveImageToPhotosAlbum(
+    options: SaveImageToPhotosAlbumOptions
+  ): void;
 
   export interface StartRecordResult {
     /**
@@ -649,7 +752,9 @@ declare namespace wx {
      * 已录制完指定帧大小的文件，会回调录音分片结果数据。如果设置了 frameSize ，则会回调此事件
      * @param {RecorderManagerFrameRecordedCallback} callback
      */
-    onFrameRecorded(callback: (res: RecorderManagerFrameRecordedCallback) => void): void;
+    onFrameRecorded(
+      callback: (res: RecorderManagerFrameRecordedCallback) => void
+    ): void;
 
     /**
      * 录音错误事件, 会回调错误信息
@@ -674,7 +779,7 @@ declare namespace wx {
      * 指定录音时长，到达指定的录音时长后会自动停止录音，单位：秒，默认值：60
      * @version 1.6.0
      */
-    duration?: number
+    duration?: number;
   }
 
   /**
@@ -732,7 +837,9 @@ declare namespace wx {
    * 获取后台音乐播放状态。
    * @deprecated 注意：1.2.0 版本开始，本接口不再维护。建议使用能力更强的 wx.getBackgroundAudioManager 接口
    */
-  export function getBackgroundAudioPlayerState(options: GetBackgroundAudioPlayerStateOptions): void;
+  export function getBackgroundAudioPlayerState(
+    options: GetBackgroundAudioPlayerStateOptions
+  ): void;
 
   export interface PlayBackgroundAudioOptions extends BaseOptions {
     /**
@@ -757,7 +864,9 @@ declare namespace wx {
    * 当用户点击“显示在聊天顶部”时，音乐不会暂停播放；
    * 当用户在其他小程序占用了音乐播放器，原有小程序内的音乐将停止播放。
    */
-  export function playBackgroundAudio(options: PlayBackgroundAudioOptions): void;
+  export function playBackgroundAudio(
+    options: PlayBackgroundAudioOptions
+  ): void;
 
   /**
    * 暂停播放音乐。
@@ -774,7 +883,9 @@ declare namespace wx {
   /**
    * 控制音乐播放进度。
    */
-  export function seekBackgroundAudio(options: SeekBackgroundAudioOptions): void;
+  export function seekBackgroundAudio(
+    options: SeekBackgroundAudioOptions
+  ): void;
 
   /**
    * 停止播放音乐。
@@ -934,7 +1045,6 @@ declare namespace wx {
    * `audioContext` 通过 audioId 跟一个 audio 组件绑定，通过它可以操作一个 audio 组件。
    */
   export interface AudioContext {
-
     /**
      * 音频的地址
      * @param {string} src
@@ -964,7 +1074,6 @@ declare namespace wx {
    * @deprecated 注意：1.6.0 版本开始，本接口不再维护。建议使用能力更强的 wx.createInnerAudioContext 接口
    */
   export function createAudioContext(audioId: string): AudioContext;
-
 
   export interface innerAudioContext {
     /**
@@ -1166,7 +1275,9 @@ declare namespace wx {
    * @param {SaveVideoToPhotosAlbumOptions} options
    * @version 1.2.0
    */
-  export function saveVideoToPhotosAlbum(options: SaveVideoToPhotosAlbumOptions): void;
+  export function saveVideoToPhotosAlbum(
+    options: SaveVideoToPhotosAlbumOptions
+  ): void;
 
   /**
    * `videoContext` 通过 videoId 跟一个 video 组件绑定，通过它可以操作一个 video 组件。
@@ -1227,7 +1338,11 @@ declare namespace wx {
      * 接口调用成功的回调函数
      * @param {{tempImagePath: string}} res
      */
-    success?: (res: { tempImagePath: string }) => void;
+    success?: (
+      res: {
+        tempImagePath: string;
+      }
+    ) => void;
   }
 
   export interface cameraContextStartRecord extends BaseOptions {
@@ -1235,7 +1350,12 @@ declare namespace wx {
      * 超过30s或页面onHide时会结束录像
      * @param {{tempThumbPath: string, tempVideoPath: string}} res
      */
-    timeoutCallback?: (res: { tempThumbPath: string, tempVideoPath: string }) => void;
+    timeoutCallback?: (
+      res: {
+        tempThumbPath: string;
+        tempVideoPath: string;
+      }
+    ) => void;
   }
 
   export interface cameraContextStopRecord extends BaseOptions {
@@ -1243,7 +1363,12 @@ declare namespace wx {
      * 接口调用成功的回调函数
      * @param {{tempThumbPath: string, tempVideoPath: string}} res
      */
-    success?: (res: { tempThumbPath: string, tempVideoPath: string }) => void;
+    success?: (
+      res: {
+        tempThumbPath: string;
+        tempVideoPath: string;
+      }
+    ) => void;
   }
 
   export interface cameraContext {
@@ -1273,7 +1398,8 @@ declare namespace wx {
    */
   export function createCameraContext(context: any): cameraContext;
 
-  export interface livePlayerContextRequestFullScreenOptions extends BaseOptions {
+  export interface livePlayerContextRequestFullScreenOptions
+    extends BaseOptions {
     /**
      * 有效值为 0（正常竖向）, 90（屏幕逆时针90度）, -90（屏幕顺时针90度）
      */
@@ -1317,7 +1443,10 @@ declare namespace wx {
    * @returns {wx.livePlayerContext}
    * @version 1.7.0
    */
-  export function createLivePlayerContext(domId: number, context: any): livePlayerContext;
+  export function createLivePlayerContext(
+    domId: number,
+    context: any
+  ): livePlayerContext;
 
   export interface livePusherContext {
     /**
@@ -1367,7 +1496,11 @@ declare namespace wx {
      * 返回文件的保存路径
      * @param {{savedFilePath: string}} res 文件的保存路径
      */
-    success?: (res: { savedFilePath: string }) => void;
+    success?: (
+      res: {
+        savedFilePath: string;
+      }
+    ) => void;
   }
 
   /**
@@ -1477,7 +1610,7 @@ declare namespace wx {
      * 文件类型，指定文件类型打开文件，有效值 doc, xls, ppt, pdf, docx, xlsx, pptx
      * @version 1.4.0
      */
-    fileType?: string
+    fileType?: string;
   }
 
   /**
@@ -1756,7 +1889,7 @@ declare namespace wx {
     /**
      * 接口调用失败的回调函数
      */
-    fail?: BaseCallback
+    fail?: BaseCallback;
   }
 
   export interface MapIncludePointsOptions {
@@ -1769,7 +1902,7 @@ declare namespace wx {
      *  格式为[上,右,下,左]，安卓上只能识别数组第一项，上下左右的padding一致。
      *  开发者工具暂不支持padding参数。
      */
-    padding?: any[]
+    padding?: any[];
   }
 
   export interface MapGetRegionOptions extends BaseOptions {
@@ -1777,7 +1910,12 @@ declare namespace wx {
      *  接口调用成功的回调函数，，西南角与东北角的经纬度
      * @param {{southwest: number, northeast: number}} res
      */
-    success?: (res: { southwest: number, northeast: number }) => void;
+    success?: (
+      res: {
+        southwest: number;
+        northeast: number;
+      }
+    ) => void;
   }
 
   export interface MapGetScaleOptions extends BaseOptions {
@@ -1906,7 +2044,7 @@ declare namespace wx {
      * 客户端基础库版本
      * @version 1.1.0
      */
-    SDKVersion: number
+    SDKVersion: number;
   }
 
   export interface GetSystemInfoOptions extends BaseOptions {
@@ -1938,7 +2076,7 @@ declare namespace wx {
     /**
      * 网络类型
      */
-    networkType: "2g" | "3g" | "4g" | "wifi" | "none" | "unknown";
+    networkType: '2g' | '3g' | '4g' | 'wifi' | 'none' | 'unknown';
   }
 
   export interface GetNetworkTypeOptions extends BaseOptions {
@@ -1961,15 +2099,16 @@ declare namespace wx {
     /**
      * 网络类型
      */
-    networkType: "2g" | "3g" | "4g" | "wifi" | "none" | "unknown";
+    networkType: '2g' | '3g' | '4g' | 'wifi' | 'none' | 'unknown';
   }
 
   /**
    * 监听网络状态变化。
    * @version 1.1.0
    */
-  export function onNetworkStatusChange(callback: (res: OnNetworkStatusChangeResult) => void): void;
-
+  export function onNetworkStatusChange(
+    callback: (res: OnNetworkStatusChangeResult) => void
+  ): void;
 
   export interface AccelerometerChangeResponse {
     /**
@@ -1991,7 +2130,9 @@ declare namespace wx {
   /**
    * 监听重力感应数据，频率：5次/秒
    */
-  export function onAccelerometerChange(callback: (res: AccelerometerChangeResponse) => void): void;
+  export function onAccelerometerChange(
+    callback: (res: AccelerometerChangeResponse) => void
+  ): void;
 
   export interface CompassChangeResponse {
     /**
@@ -2003,7 +2144,9 @@ declare namespace wx {
   /**
    * 监听罗盘数据，频率：5次/秒
    */
-  export function onCompassChange(callback: (res: CompassChangeResponse) => void): void;
+  export function onCompassChange(
+    callback: (res: CompassChangeResponse) => void
+  ): void;
 
   export interface MakePhoneCallOptions {
     /**
@@ -2094,7 +2237,7 @@ declare namespace wx {
      * 图标，只支持"success"、"loading"
      * 'none' @version 1.9.0
      */
-    icon?: "success" | "loading" | 'none';
+    icon?: 'success' | 'loading' | 'none';
 
     /**
      * 自定义图标的本地路径，image 的优先级高于 icon
@@ -2248,7 +2391,9 @@ declare namespace wx {
   /**
    * 动态设置当前页面的标题。
    */
-  export function setNavigationBarTitle(options: SetNavigationBarTitleOptions): void;
+  export function setNavigationBarTitle(
+    options: SetNavigationBarTitleOptions
+  ): void;
 
   /**
    * 在当前页面显示导航条加载动画。
@@ -2295,7 +2440,9 @@ declare namespace wx {
    * @param {SetNavigationBarColorOptions} options
    * @version 1.4.0
    */
-  export function setNavigationBarColor(options: SetNavigationBarColorOptions): void;
+  export function setNavigationBarColor(
+    options: SetNavigationBarColorOptions
+  ): void;
 
   export interface SetTabBarBadgeOptions extends BaseOptions {
     /**
@@ -2359,7 +2506,7 @@ declare namespace wx {
     /**
      * tabbar上边框的颜色， 仅支持 black/white
      */
-    borderStyle: 'black' | 'white'
+    borderStyle: 'black' | 'white';
   }
 
   /**
@@ -2641,32 +2788,36 @@ declare namespace wx {
     /**
      * 同 [transform-function matrix](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix?t=1477656494026)
      */
-    matrix(a: number,
-           b: number,
-           c: number,
-           d: number,
-           tx: number,
-           ty: number): this;
+    matrix(
+      a: number,
+      b: number,
+      c: number,
+      d: number,
+      tx: number,
+      ty: number
+    ): this;
 
     /**
      * 同 [transform-function matrix3d](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix3d?t=1477656494026)
      */
-    matrix3d(a1: number,
-             b1: number,
-             c1: number,
-             d1: number,
-             a2: number,
-             b2: number,
-             c2: number,
-             d2: number,
-             a3: number,
-             b3: number,
-             c3: number,
-             d3: number,
-             a4: number,
-             b4: number,
-             c4: number,
-             d4: number): this;
+    matrix3d(
+      a1: number,
+      b1: number,
+      c1: number,
+      d1: number,
+      a2: number,
+      b2: number,
+      c2: number,
+      d2: number,
+      a3: number,
+      b3: number,
+      c3: number,
+      d3: number,
+      a4: number,
+      b4: number,
+      c4: number,
+      d4: number
+    ): this;
   }
 
   export interface AnimationOptions {
@@ -2678,13 +2829,14 @@ declare namespace wx {
     /**
      * 定义动画的效果，默认值"linear"
      */
-    timingFunction?: | "linear"
-      | "ease"
-      | "ease-in"
-      | "ease-in-out"
-      | "ease-out"
-      | "step-start"
-      | "step-end";
+    timingFunction?:
+      | 'linear'
+      | 'ease'
+      | 'ease-in'
+      | 'ease-in-out'
+      | 'ease-out'
+      | 'step-start'
+      | 'step-end';
 
     /**
      * 动画延迟时间，单位 ms，默认值 0
@@ -2784,11 +2936,13 @@ declare namespace wx {
      * @param x 图像左上角的x坐标
      * @param y 图像左上角的y坐标
      */
-    drawImage(imageResource: string,
-              x: number,
-              y: number,
-              width: number,
-              height: number): void;
+    drawImage(
+      imageResource: string,
+      x: number,
+      y: number,
+      width: number,
+      height: number
+    ): void;
 
     /**
      * 对当前路径进行填充
@@ -2837,12 +2991,14 @@ declare namespace wx {
      * @param eAngle 终止弧度
      * @param counterclockwise 可选。指定弧度的方向是逆时针还是顺时针。默认是false，即顺时针。
      */
-    arc(x: number,
-        y: number,
-        r: number,
-        sAngle: number,
-        eAngle: number,
-        counterclockwise?: boolean): void;
+    arc(
+      x: number,
+      y: number,
+      r: number,
+      sAngle: number,
+      eAngle: number,
+      counterclockwise?: boolean
+    ): void;
 
     /**
      * 添加一个矩形路径到当前路径。
@@ -2889,12 +3045,14 @@ declare namespace wx {
      * @param x 结束点的x坐标
      * @param y 结束点的y坐标
      */
-    bezierCurveTo(cp1x: number,
-                  cp1y: number,
-                  cp2x: number,
-                  cp2y: number,
-                  x: number,
-                  y: number): void;
+    bezierCurveTo(
+      cp1x: number,
+      cp1y: number,
+      cp2x: number,
+      cp2y: number,
+      x: number,
+      y: number
+    ): void;
 
     // 样式
 
@@ -2923,10 +3081,12 @@ declare namespace wx {
      * @param blur 阴影的模糊级别，数值越大越模糊(0~100)
      * @param color 阴影的颜色('rgb(255, 0, 0)'或'rgba(255, 0, 0, 0.6)'或'#ff0000'格式的颜色字符串)
      */
-    setShadow(offsetX: number,
-              offsetY: number,
-              blur: number,
-              color: string): void;
+    setShadow(
+      offsetX: number,
+      offsetY: number,
+      blur: number,
+      color: string
+    ): void;
 
     /**
      * 创建一个线性的渐变颜色。需要使用 addColorStop() 来指定渐变点，至少要两个。
@@ -3019,7 +3179,9 @@ declare namespace wx {
   /**
    * 把当前画布的内容导出生成图片，并返回文件路径
    */
-  export function canvasToTempFilePath(options: CanvasToTempFilePathOptions): string;
+  export function canvasToTempFilePath(
+    options: CanvasToTempFilePathOptions
+  ): string;
 
   /**
    * 开始下拉刷新，调用后触发下拉刷新动画，效果与用户手动下拉刷新一致
@@ -3059,7 +3221,7 @@ declare namespace wx {
     /**
      * 指定属性名列表，返回节点对应属性名的当前属性值（只能获得组件文档中标注的常规属性值， id class style 和事件绑定的属性值不可获取）
      */
-    properties: any[]
+    properties: any[];
   }
 
   export interface NodesRef {
@@ -3093,7 +3255,7 @@ declare namespace wx {
      * @returns {wx.SelectQuery}
      * @version 1.6.0
      */
-    in(context: any): SelectQuery
+    in(context: any): SelectQuery;
 
     /**
      * 在当前页面下选择第一个匹配选择器selector的节点，返回一个NodesRef对象实例，可以用于获取节点信息。
@@ -3150,7 +3312,9 @@ declare namespace wx {
    * @returns {{extConfig: wx.IData}}
    * @version 1.1.0
    */
-  export function getExtConfigSync(): { extConfig: IData };
+  export function getExtConfigSync(): {
+    extConfig: IData;
+  };
 
   // ---------------------------------- 开放接口API列表 ----------------------------------
 
@@ -3458,13 +3622,17 @@ declare namespace wx {
     /**
      * 需要添加的卡券列表
      */
-    cardList: Card[]
+    cardList: Card[];
 
     /**
      * 卡券添加结果列表
      * @param {{cardList: CardItem[]}} res
      */
-    success?: (res: { cardList: CardItem[] }) => void;
+    success?: (
+      res: {
+        cardList: CardItem[];
+      }
+    ) => void;
   }
 
   /**
@@ -3489,7 +3657,7 @@ declare namespace wx {
     /**
      *  需要打开的卡券列表
      */
-    cardList: openCardItem[]
+    cardList: openCardItem[];
   }
 
   /**
@@ -3504,7 +3672,11 @@ declare namespace wx {
      * 用户授权结果，其中 key 为 scope 值，value 为 Bool 值，表示用户是否允许授权，
      * @param {{authSetting: wx.IData}} res
      */
-    success?: (res: { authSetting: IData }) => void;
+    success?: (
+      res: {
+        authSetting: IData;
+      }
+    ) => void;
   }
 
   /**
@@ -3548,7 +3720,9 @@ declare namespace wx {
    * @param {NavigateToMiniProgramOptions} options
    * @version 1.3.0
    */
-  export function navigateToMiniProgram(options: NavigateToMiniProgramOptions): void;
+  export function navigateToMiniProgram(
+    options: NavigateToMiniProgramOptions
+  ): void;
 
   export interface NavigateBackMiniProgramOptions extends SuccessOptions {
     /**
@@ -3562,7 +3736,9 @@ declare namespace wx {
    * @param {NavigateBackMiniProgramOptions} options
    * @version 1.3.0
    */
-  export function navigateBackMiniProgram(options: NavigateBackMiniProgramOptions): void;
+  export function navigateBackMiniProgram(
+    options: NavigateBackMiniProgramOptions
+  ): void;
 
   export interface ChooseInvoiceTitleResult {
     /**

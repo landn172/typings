@@ -1,17 +1,24 @@
 {
   "name": "@tuhu/dt-weapp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "weapp-api tsd",
   "main": "index.d.ts",
   "typings": "index.d.ts",
   "scripts": {
     "test": "tsc -p tsconfig.json"
   },
-  "files": ["*.ts"],
-  "keywords": ["weapp", "api", "tsd"],
+  "files": [
+    "*.ts"
+  ],
+  "keywords": [
+    "weapp",
+    "api",
+    "tsd"
+  ],
   "author": "landn172",
   "license": "MIT",
   "devDependencies": {
+    "@types/lodash": "^4.14.100",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.6.0",
     "typescript": "^2.6.2"
@@ -23,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/landn172/typings/issues"
   },
-  "homepage": "https://github.com/landn172/typings"
+  "homepage": "https://github.com/landn172/typings",
+  "dependencies": {
+    "lodash": "^4.17.5"
+  }
 }
