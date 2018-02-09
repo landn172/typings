@@ -2,5 +2,6 @@
   "typescript.validate.enable": true,
   "javascript.validate.enable": true,
   "prettier.eslintIntegration": false,
-  "tslint.autoFixOnSave": true
+  "tslint.autoFixOnSave": true,
+  "prettier.semi": true
 }

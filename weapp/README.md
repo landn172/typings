@@ -53,3 +53,30 @@ class MyPage implements IPageClass {
   }
 }
 ```
+
+3. 事件 [新增 v1.1.0] [示例](https://github.com/landn172/typings/blob/master/weapp/weapp-tests.ts)
+
+节选
+
+```ts
+  onTouch(
+    e: wx.ITouchEvent<{
+      x: number;
+      y: number;
+    }>
+  ) {
+    const {
+      type,
+      changedTouches,
+      currentTarget,
+      timeStamp,
+      touches,
+      detail,
+      target
+    } = e;
+    const { x, y } = detail;
+    touches.forEach(touchEvent => {
+      const { clientX, clientY } = touchEvent;
+    });
+  }
+```

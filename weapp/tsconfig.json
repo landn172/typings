@@ -1,17 +1,22 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "baseUrl": ".",
+    "module": "es2015",
     "lib": ["es6", "dom"],
-    "target": "es6",
+    "target": "es5",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "./dist/",
-    "typeRoots": ["./", "./node_modules/@types"],
-    "types": []
+    "typeRoots": ["./", "node_modules/@types"],
+    "types": [],
+    "paths": {
+      "lodash/*": ["node_modules/@types/lodash/*"]
+    }
   },
   "files": ["index.d.ts", "page.d.ts", "weapp-tests.ts"],
   "exclude": ["node_modules"]
