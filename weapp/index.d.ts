@@ -2017,6 +2017,12 @@ declare namespace wx {
     windowHeight: number;
 
     /**
+     * 状态栏的高度
+     * @version 1.9.0
+     */
+    statusBarHeight?: number;
+
+    /**
      * 微信设置的语言
      */
     language: string;
@@ -2044,7 +2050,7 @@ declare namespace wx {
      * 客户端基础库版本
      * @version 1.1.0
      */
-    SDKVersion: number;
+    SDKVersion: string;
   }
 
   export interface GetSystemInfoOptions extends BaseOptions {
