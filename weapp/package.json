@@ -1,6 +1,6 @@
 {
   "name": "@tuhu/dt-weapp",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "weapp-api tsd",
   "main": "index.d.ts",
   "typings": "index.d.ts",
