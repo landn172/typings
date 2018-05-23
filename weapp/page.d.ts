@@ -80,9 +80,11 @@ declare interface PageOptions<P extends Page = Page, Data = DefaultData<P>> {
 
 declare interface IPage {
   /**
-   * 将数据从逻辑层发送到视图层，同时改变对应的
+   * 将数据从逻辑层发送到视图层（异步），
+   * 同时改变对应的 this.data 的值（同步）
+   * @param cb 回调函数，1.5.0开始支持
    */
-  setData(opts: wx.IData): void
+  setData(opts: wx.IData, cb?: () => void): void
   /**
    * 获取到当前页面的路径
    * @version 1.2.0

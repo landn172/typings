@@ -1630,7 +1630,7 @@ declare namespace wx {
     /**
      * 需要存储的内容
      */
-    data: IData | string;
+    data: any;
   }
 
   /**
@@ -1644,7 +1644,7 @@ declare namespace wx {
    * @param {string} key
    * @param {wx.IData | string} data
    */
-  export function setStorageSync(key: string, data: IData | string): void;
+  export function setStorageSync(key: string, data: any): void;
 
   export interface GetStorageOptions extends SuccessOptions {
     /**
@@ -3227,23 +3227,24 @@ declare namespace wx {
     /**
      * 指定属性名列表，返回节点对应属性名的当前属性值（只能获得组件文档中标注的常规属性值， id class style 和事件绑定的属性值不可获取）
      */
-    properties: any[];
+    properties?: any[];
   }
 
-  export interface NodesRef {
+  interface IBaseNodesRef {
     /**
      * 添加节点的布局位置的查询请求，相对于显示区域，以像素为单位。
-     * @param {wx.IData} rect
+     * @param cb 回调 节点信息会在callback中返回
      * @returns {wx.SelectQuery}
      */
-    boundingClientRect(rect: IData): SelectQuery;
+    boundingClientRect(cb?: (rect: any) => void): SelectQuery;
 
     /**
      * 添加节点的滚动位置查询请求，以像素为单位。
-     * @param {wx.IData} res
+     * 节点必须是`scroll-view`或者viewport
+     * @param cb 在执行SelectQuery的exec方法后，节点信息会在callback中返回
      * @returns {wx.SelectQuery}
      */
-    scrollOffset(res: IData): SelectQuery;
+    scrollOffset(cb?: (res: IScrollRect) => void): SelectQuery;
 
     /**
      * 获取节点的相关信息，需要获取的字段在fields中指定。
@@ -3251,7 +3252,73 @@ declare namespace wx {
      * @param {wx.IData} res
      * @returns {wx.SelectQuery}
      */
-    fields(fields: FieldsOptions, res: IData): SelectQuery;
+    fields(fields: FieldsOptions, cb?: (res: any) => void): SelectQuery;
+  }
+
+  /**
+   * 节点信息
+   */
+  interface INodesInfo {
+    /**
+     * 节点的ID
+     */
+    id: string;
+    /**
+     * 节点的dataset
+     */
+    dataset: IData;
+  }
+
+  interface IRect extends INodesInfo {
+    /**
+     * 节点的宽度
+     */
+    width: number;
+    /**
+     * 节点的高度
+     */
+    height: number;
+    /**
+     * 节点的上边界坐标
+     */
+    top: number;
+    /**
+     * 节点的右边界坐标
+     */
+    right: number;
+    /**
+     * 节点的下边界坐标
+     */
+    bottom: number;
+    /**
+     * 节点的左边界坐标
+     */
+    left: number;
+  }
+
+  interface IScrollRect extends INodesInfo {
+    /**
+     * 节点的水平滚动位置
+     */
+    scrollLeft: number;
+    /**
+     * 节点的竖直滚动位置
+     */
+    scrollTop: number;
+  }
+
+  interface IFieldCbData extends IRect {}
+  interface IFieldCbData extends IScrollRect {}
+  interface IFieldCbData extends IData {}
+
+  export interface NodesRef extends IBaseNodesRef {
+    boundingClientRect(cb?: (rect: IRect) => void): SelectQuery;
+    fields(fields: FieldsOptions, cb?: (res: IFieldCbData) => void): SelectQuery;
+  }
+
+  export interface NodesRefs extends IBaseNodesRef {
+    boundingClientRect(cb?: (rects: IRect[]) => void): SelectQuery;
+    fields(fields: FieldsOptions, cb?: (res: IFieldCbData[]) => void): SelectQuery;
   }
 
   export interface SelectQuery {
@@ -3275,7 +3342,7 @@ declare namespace wx {
      * @param {string} selector
      * @returns {NodesRef}
      */
-    selectAll(selector: string): NodesRef;
+    selectAll(selector: string): NodesRefs;
 
     /**
      * 选择显示区域，可用于获取显示区域的尺寸、滚动位置等信息
@@ -3287,7 +3354,7 @@ declare namespace wx {
      * 执行所有的请求，请求结果按请求次序构成数组，在callback的第一个参数中返回。
      * @param {wx.IData} res
      */
-    exec(res: IData): void;
+    exec(cb?: (res: any[]) => void): void;
   }
 
   /**
