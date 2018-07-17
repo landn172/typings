@@ -1,6 +1,10 @@
 {
   "name": "@tuhu/dt-weapp",
-  "version": "1.1.3",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "version": "1.1.5",
   "description": "weapp-api tsd",
   "main": "index.d.ts",
   "typings": "index.d.ts",
