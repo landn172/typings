@@ -2885,6 +2885,19 @@ declare namespace wx {
      */
     clearActions(): void;
 
+    /**
+     * 将之前在绘图上下文中的描述（路径、变形、样式）画到 canvas 中。
+     * @param callback v1.7.0 绘制完成后回调
+     * @param reserve 非必填。本次绘制是否接着上一次绘制，即reserve参数为false，则在本次调用drawCanvas绘制之前native层应先清空画布再继续绘制；若reserver参数为true，则保留当前画布上的内容，本次调用drawCanvas绘制的内容覆盖在上面，默认 false
+     */
+    draw(reserve?: boolean, callback?: Function): void;
+
+    /**
+     * clip() 方法从原始画布中剪切任意形状和尺寸。一旦剪切了某个区域，则所有之后的绘图都会被限制在被剪切的区域内（不能访问画布上的其他区域）。可以在使用 clip() 方法前通过使用 save() 方法对当前画布区域进行保存，并在以后的任意时间对其进行恢复（通过 restore() 方法）。
+     * @version 1.6.0
+     */
+    clip(): void;
+
     // 变形
 
     /**
@@ -3139,6 +3152,13 @@ declare namespace wx {
      * @param miterLimit 最大斜接长度
      */
     setMiterLimit(miterLimit: number): void;
+
+    /**
+     * 创建一个矩形。
+     * 用 fill() 或者 stroke() 方法将矩形真正的画到 canvas 中。
+     * @memberof CanvasContext
+     */
+    rect(x: number, y: number, width: number, height: number): void;
   }
 
   /**
@@ -3313,12 +3333,18 @@ declare namespace wx {
 
   export interface NodesRef extends IBaseNodesRef {
     boundingClientRect(cb?: (rect: IRect) => void): SelectQuery;
-    fields(fields: FieldsOptions, cb?: (res: IFieldCbData) => void): SelectQuery;
+    fields(
+      fields: FieldsOptions,
+      cb?: (res: IFieldCbData) => void
+    ): SelectQuery;
   }
 
   export interface NodesRefs extends IBaseNodesRef {
     boundingClientRect(cb?: (rects: IRect[]) => void): SelectQuery;
-    fields(fields: FieldsOptions, cb?: (res: IFieldCbData[]) => void): SelectQuery;
+    fields(
+      fields: FieldsOptions,
+      cb?: (res: IFieldCbData[]) => void
+    ): SelectQuery;
   }
 
   export interface SelectQuery {
