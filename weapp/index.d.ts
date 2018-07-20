@@ -2826,6 +2826,10 @@ declare namespace wx {
     ): this;
   }
 
+  export type TextBaseLineOptions = 'top' | 'bottom' | 'middle' | 'normal';
+
+  export type TextAlignOptions = 'left' | 'center' | 'right';
+
   export interface AnimationOptions {
     /**
      * 动画持续时间，单位ms，默认值 400
@@ -3076,16 +3080,75 @@ declare namespace wx {
     // 样式
 
     /**
+     * 用于设置文字的水平对齐
+     * @version 1.4.0
+     * @param {TextBaseLineOptions} textBaseline
+     * @memberof CanvasContext
+     */
+    setTextBaseline(textBaseline: TextBaseLineOptions): void;
+
+    /**
+     * 用于设置文字的对齐
+     *
+     * @param {TextAlignOptions} align
+     * @memberof CanvasContext
+     */
+    setTextAlign(align: TextAlignOptions): void;
+
+    /**
+     * 设置阴影样式。
+     *
+     * @param {number} offsetX
+     * @param {number} offsetY
+     * @param {number} blur
+     * @param {string} color
+     * @memberof CanvasContext
+     */
+    setShadow(
+      offsetX: number,
+      offsetY: number,
+      blur: number,
+      color: string
+    ): void;
+
+    /**
      * 设置纯色填充。
      * @param color 设置为填充样式的颜色('rgb(255, 0, 0)'或'rgba(255, 0, 0, 0.6)'或'#ff0000'格式的颜色字符串)
      */
     setFillStyle(color: string): void;
 
     /**
+     * 字体
+     *
+     * @type {string}
+     * @memberof CanvasContext
+     */
+    font: string;
+
+    /**
+     * 测量文本尺寸信息，目前仅返回文本宽度。同步接口。
+     *
+     * @param {string} text
+     * @returns {{ width: number }}
+     * @version 1.9.90
+     * @memberof CanvasContext
+     */
+    measureText(text: string): { width: number };
+
+    /**
      * 设置纯色描边
      * @param color 设置为填充样式的颜色('rgb(255, 0, 0)'或'rgba(255, 0, 0, 0.6)'或'#ff0000'格式的颜色字符串)
      */
     setStrokeStyle(color: string): void;
+
+    /**
+     * 设置线条的宽度。
+     *
+     * @param {number[]} pattern 一组描述交替绘制线段和间距（坐标空间单位）长度的数字
+     * @param {number} offset 虚线偏移量
+     * @memberof CanvasContext
+     */
+    setLineDash(pattern: number[], offset: number): void;
 
     /**
      * 设置全局画笔透明度。
