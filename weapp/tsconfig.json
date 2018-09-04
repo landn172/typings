@@ -18,6 +18,6 @@
       "lodash/*": ["node_modules/@types/lodash/*"]
     }
   },
-  "files": ["index.d.ts", "page.d.ts", "weapp-tests.ts"],
+  "files": ["index.d.ts", "page.d.ts", "app.d.ts", "component.d.ts", "weapp-tests.ts"],
   "exclude": ["node_modules"]
 }

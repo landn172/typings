@@ -4,7 +4,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "weapp-api tsd",
   "main": "index.d.ts",
   "typings": "index.d.ts",
