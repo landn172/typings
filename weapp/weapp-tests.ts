@@ -134,3 +134,9 @@ class IMyPage implements IPageClass {
 }
 
 Page(new IMyPage());
+
+Component({
+  created() {
+    this.triggerEvent('a', {});
+  }
+});
