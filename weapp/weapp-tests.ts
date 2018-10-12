@@ -136,7 +136,26 @@ class IMyPage implements IPageClass {
 Page(new IMyPage());
 
 Component({
+  data: {
+    d: [] as any[]
+  },
+  properties: {
+    test: {
+      type: String,
+      value: 'asdf',
+      observer(nv: string) {
+        console.log(nv);
+      }
+    },
+    test2: Number
+  },
   created() {
+    const { test, test2 } = this.properties;
     this.triggerEvent('a', {});
+  },
+  methods: {
+    onClick() {
+      this.d = [''];
+    }
   }
 });

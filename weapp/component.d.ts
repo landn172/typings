@@ -1,25 +1,54 @@
 /// <reference path="./index.d.ts" />
 
-declare type CombinedComponentInstance<
-  Instance extends Component,
-  Data,
-  Method
-> = Instance & Method & wx.IData;
+type DefaultProps = Record<string, any>;
 
-declare type ThisTypedComponentOptionsWithArrayProps<
-  P extends Component,
-  Data extends Record<string, any>,
-  Method
-> = ComponentOptions<P, Data> &
-  Method &
-  ThisType<CombinedComponentInstance<P, Data, Method>>;
+type Prop < T > = { (): T } | { new (...args: any[]): T & object };
+
+type DataDef < Data , Props, P> = Data | ((this: Readonly<Props> & P) => Data);
+
+interface PropOptions<T = any> {
+  type?: Prop<T> | Prop<T>[];
+  value?: T | null | undefined;
+  observer?(newVal: T, oldVal: T, changedPath: string): void;
+}
+
+type PropValidator < T > = PropOptions<T> | Prop<T> | Prop<T>[];
+
+type RecordPropsDefinition < T > = { [K in keyof T]: PropValidator<T[K]> };
+
+type ArrayPropsDefinition < T > = (keyof T)[];
+
+type PropsDefinition < T > = ArrayPropsDefinition<T> | RecordPropsDefinition<T>;
+
+declare type CombinedComponentInstance <
+Instance extends Component ,
+Data,
+Method,
+Props
+> = Data & Instance & Method & { properties: Props };
+
+declare type ThisTypedComponentOptionsWithArrayProps <
+P extends Component ,
+Data,
+Methods,
+Props
+> = object &
+  ComponentOptions<
+    P,
+    DataDef<Data, Props, P>,
+    Methods,
+    RecordPropsDefinition<Props>
+  > &
+  ThisType<CombinedComponentInstance<P, Data, Methods, Readonly<Props>>>;
 
 /**
  * Component 实现的接口对象
  */
 declare interface ComponentOptions<
   P extends Component = Component,
-  Data = DefaultData<P>
+  Data = DefaultData<P>,
+  Methods = DefaultMethods<P>,
+  PropsDef = PropsDefinition<DefaultProps>
 > {
   /**
    * 开发者可以添加任意的函数或数据到 object 参数中，
@@ -36,29 +65,21 @@ declare interface ComponentOptions<
    * @type {wx.IData}
    * @memberof ComponentOptions
    */
-  properties?: {
-    [key: string]: {
-      type: any;
-      value: any;
-      observer: (newVal: any, oldVal: any, changedPath: any) => void;
-    };
-  };
+  properties?: PropsDef;
   /**
    * 组件的内部数据，和 properties 一同用于组件的模版渲染
    *
    * @type {wx.IData}
    * @memberof ComponentOptions
    */
-  data?: wx.IData;
+  data?: Data;
   /**
    * 组件的方法，包括事件响应函数和任意的自定义方法，关于事件响应函数的使用
    *
    * @type {wx.IData}
    * @memberof ComponentOptions
    */
-  methods?: {
-    [key: string]: (...args: any[]) => void;
-  };
+  methods?: Methods;
   /**
    * 类似于mixins和traits的组件间代码复用机制
    *
@@ -72,32 +93,32 @@ declare interface ComponentOptions<
    *
    * @memberof ComponentOptions
    */
-  created?: () => void;
+  created?(): void;
   /**
    * 组件生命周期函数，在组件实例进入页面节点树时执行
    *
    * @memberof ComponentOptions
    */
-  attached?: () => void;
+  attached?(): void;
   /**
    * 组件生命周期函数，在组件布局完成后执行，
    * 此时可以获取节点信息（使用 SelectorQuery ）
    *
    * @memberof ComponentOptions
    */
-  ready?: () => void;
+  ready?(): void;
   /**
    * 组件生命周期函数，在组件实例被移动到节点树另一个位置时执行
    *
    * @memberof ComponentOptions
    */
-  moved?: () => void;
+  moved?(): void;
   /**
    * 组件生命周期函数，在组件实例被从页面节点树移除时执行
    *
    * @memberof ComponentOptions
    */
-  detached?: () => void;
+  detached?(): void;
   relations?: {
     [key: string]: {
       /** 目标组件的相对关系  */
@@ -145,15 +166,15 @@ declare interface ComponentOptions<
    * @version 2.2.3
    * @memberof ComponentOptions
    */
-  definitionFilter?: () => void;
+  definitionFilter?(): void;
 }
 
 /**
  * Component的构造方法
  */
 declare interface IComponentConstructor<P extends Component = Component> {
-  <Data = Record<string, any>, Method = object>(
-    opts: ThisTypedComponentOptionsWithArrayProps<P, Data, Method>
+  <Data = Record<string, any>, Methods = object, Props = object>(
+    opts: ThisTypedComponentOptionsWithArrayProps<P, Data, Methods, Props>
   ): void;
 }
 
@@ -185,8 +206,8 @@ declare interface IComponent {
     name: string,
     detail?: any,
     options?: {
-      bubbles?: boolean;
-      composed?: boolean;
+    bubbles?: boolean;
+    composed?: boolean;
     }
   ): void;
   /**
@@ -226,4 +247,4 @@ declare interface IComponent {
 
 declare interface Component extends IComponent {}
 
-declare var Component: IComponentConstructor;
+declare let Component: IComponentConstructor;
