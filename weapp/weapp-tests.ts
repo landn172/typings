@@ -151,11 +151,12 @@ Component({
   },
   created() {
     const { test, test2 } = this.properties;
-    this.triggerEvent('a', {});
+    this.triggerEvent('a', { test, test2 });
   },
   methods: {
     onClick() {
-      this.d = [''];
+      const { d, test } = this.data;
+      console.log(d, test);
     }
   }
 });

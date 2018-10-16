@@ -2,9 +2,9 @@
 
 type DefaultProps = Record<string, any>;
 
-type Prop < T > = { (): T } | { new (...args: any[]): T & object };
+type Prop<T> = { (): T } | { new (...args: any[]): T & object };
 
-type DataDef < Data , Props, P> = Data | ((this: Readonly<Props> & P) => Data);
+type DataDef<Data, Props, P> = Data | ((this: Readonly<Props> & P) => Data);
 
 interface PropOptions<T = any> {
   type?: Prop<T> | Prop<T>[];
@@ -12,26 +12,27 @@ interface PropOptions<T = any> {
   observer?(newVal: T, oldVal: T, changedPath: string): void;
 }
 
-type PropValidator < T > = PropOptions<T> | Prop<T> | Prop<T>[];
+type PropValidator<T> = PropOptions<T> | Prop<T> | Prop<T>[];
 
-type RecordPropsDefinition < T > = { [K in keyof T]: PropValidator<T[K]> };
+type RecordPropsDefinition<T> = { [K in keyof T]: PropValidator<T[K]> };
 
-type ArrayPropsDefinition < T > = (keyof T)[];
+type ArrayPropsDefinition<T> = (keyof T)[];
 
-type PropsDefinition < T > = ArrayPropsDefinition<T> | RecordPropsDefinition<T>;
+type PropsDefinition<T> = ArrayPropsDefinition<T> | RecordPropsDefinition<T>;
 
-declare type CombinedComponentInstance <
-Instance extends Component ,
-Data,
-Method,
-Props
-> = Data & Instance & Method & { properties: Props };
+declare type CombinedComponentInstance<
+  Instance extends Component,
+  Data,
+  Method,
+  Props
+> = { data: Data } & Instance &
+  Method & { properties: Props } & { data: Props };
 
-declare type ThisTypedComponentOptionsWithArrayProps <
-P extends Component ,
-Data,
-Methods,
-Props
+declare type ThisTypedComponentOptionsWithArrayProps<
+  P extends Component,
+  Data,
+  Methods,
+  Props
 > = object &
   ComponentOptions<
     P,
@@ -206,8 +207,8 @@ declare interface IComponent {
     name: string,
     detail?: any,
     options?: {
-    bubbles?: boolean;
-    composed?: boolean;
+      bubbles?: boolean;
+      composed?: boolean;
     }
   ): void;
   /**
