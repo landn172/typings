@@ -60,10 +60,9 @@ declare interface PageOptions<P extends Page = Page, Data = DefaultData<P>> {
    */
   onReachBottom?: () => void;
 
-  
   onShareAppMessage?: (
     item: {
-      /** 
+      /**
        *  转发事件来源。
        *  button：页面内转发按钮；
        *  menu：右上角转发菜单
@@ -90,7 +89,7 @@ declare interface PageOptions<P extends Page = Page, Data = DefaultData<P>> {
   /**
    * 页面滚动触发事件的处理函数
    */
-  onPageScroll?: ({ scrollTop }: { scrollTop: number }) => void;
+  onPageScroll?: (opts: { scrollTop: number }) => void;
 
   /**
    * 当前是 tab 页时，点击 tab 时触发
@@ -100,7 +99,7 @@ declare interface PageOptions<P extends Page = Page, Data = DefaultData<P>> {
    * @param text 被点击tabItem的按钮文字
    */
   onTabItemTap?: (
-    { index, pagePath, text }: { index: string; pagePath: string; text: string }
+    opts: { index: string; pagePath: string; text: string }
   ) => void;
 }
 

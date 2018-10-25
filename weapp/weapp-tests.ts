@@ -31,6 +31,9 @@ Page({
     abc: 1,
     pages: []
   },
+  onLoad() {
+    this.onShowIn()
+  },
   onPageScroll(opts) {
     const scrollTop = opts.scrollTop;
     const route = this.__route__ as string;
@@ -42,6 +45,10 @@ Page({
       console.log(pages);
     });
     this.data.c = '';
+  },
+  onTabItemTap(opts) {
+    const { index, pagePath, text } = opts;
+    console.log(index, pagePath, text);
   },
   onShowIn() {
     if (!this.data) {
