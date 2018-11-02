@@ -93,7 +93,7 @@ declare interface PageOptions<P extends Page = Page, Data = DefaultData<P>> {
 
   /**
    * 当前是 tab 页时，点击 tab 时触发
-   * @version 1.9.0
+   * @since 1.9.0
    * @param index 被点击tabItem的序号，从0开始
    * @param pagePath 被点击tabItem的页面路径
    * @param text 被点击tabItem的按钮文字
@@ -112,7 +112,7 @@ declare interface IPage {
   setData(opts: wx.IData, cb?: () => void): void;
   /**
    * 获取到当前页面的路径
-   * @version 1.2.0
+   * @since 1.2.0
    */
   route: string;
   /**

@@ -148,7 +148,7 @@ declare interface ComponentOptions<
    * created、attached、ready、moved、detached将收归到lifetimes字段内进行声明，
    * 原有声明方式仍旧有效，如同时存在两种声明方式，则lifetimes字段内声明方式优先级最高
    *
-   * @version 2.2.3
+   * @since 2.2.3
    * @type {*}
    * @memberof ComponentOptions
    */
@@ -156,7 +156,7 @@ declare interface ComponentOptions<
   /**
    * 组件所在页面的生命周期声明对象，目前仅支持页面的show和hide两个生命周期
    *
-   * @version 2.2.3
+   * @since 2.2.3
    * @type {*}
    * @memberof ComponentOptions
    */
@@ -164,7 +164,7 @@ declare interface ComponentOptions<
   /**
    * 定义段过滤器，用于自定义组件扩展
    *
-   * @version 2.2.3
+   * @since 2.2.3
    * @memberof ComponentOptions
    */
   definitionFilter?(): void;

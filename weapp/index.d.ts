@@ -3,66 +3,13 @@
 /// <reference path="./page.d.ts" />
 /// <reference path="./app.d.ts" />
 /// <reference path="./component.d.ts" />
+/// <reference path="./api/index.d.ts" />
 
 declare namespace wx {
-  interface IEventTarget {
-    /**
-     * 事件源组件的id
-     */
-    id: string;
-    /**
-     * 当前组件的类型
-     */
-    tagName: string;
-    /**
-     * 事件源组件上由data-开头的自定义属性组成的集合
-     */
-    dataset: wx.IData;
-  }
-
-  interface IEventTouch {
-    clientX: number;
-    clientY: number;
-    identifier: number;
-    pageX: number;
-    pageY: number;
-  }
-
   interface IEventCanvasTouch {
     identifier: number;
     x: number;
     y: number;
-  }
-
-  /**
-   * base事件参数
-   */
-  interface IBaseEvent {
-    /**
-     * 事件类型
-     */
-    type: string;
-    timeStamp: number;
-    target: IEventTarget;
-    currentTarget: IEventTarget;
-  }
-
-  interface ICustomEvent<P extends wx.IData = wx.IData> extends IBaseEvent {
-    /**
-     * 额外的信息
-     */
-    detail: P;
-  }
-
-  /**
-   * 触摸事件返回
-   */
-  export interface ITouchEvent<
-    P extends wx.IData = wx.IData,
-    T extends IEventTouch = IEventTouch
-  > extends ICustomEvent<P> {
-    touches: T[];
-    changedTouches: T[];
   }
 
   /**
@@ -75,1417 +22,7 @@ declare namespace wx {
     changedTouches: T[];
   }
 
-  /**
-   * callback回掉函数
-   */
-  export type BaseCallback = (res: any) => void;
-
-  export interface BaseOptions {
-    /**
-     * 接口调用成功的回调函数
-     */
-    success?: BaseCallback;
-
-    /**
-     * 接口调用失败的回调函数
-     */
-    fail?: BaseCallback;
-
-    /**
-     * 接口调用结束的回调函数（调用成功、失败都会执行）
-     */
-    complete?: BaseCallback;
-  }
-
-  export interface SuccessOptions extends BaseOptions {
-    /**
-     * 接口调用成功的回调函数
-     * @param {{errMsg: string}} res
-     */
-    success?: (
-      res: {
-        errMsg: string;
-      }
-    ) => void;
-  }
-
-  export interface ShareOptions {
-    /**
-     * 分享标题, 默认为当前小程序名称
-     */
-    title?: string;
-
-    /**
-     * 分享描述, 默认为当前小程序名称
-     */
-    desc?: string;
-
-    /**
-     * 分享路径, 默认为当前页面path, 必须是以 / 开头的完整路径
-     */
-    path?: string;
-  }
-
-  export interface IData {
-    [key: string]: any;
-  }
-
-  // ---------------------------------- 网络API列表 ----------------------------------
-
-  export interface RequestResult {
-    /**
-     * 开发者服务器返回的数据
-     */
-    data: string | IData | ArrayBuffer;
-    /**
-     * 开发者服务器返回的 HTTP 状态码
-     */
-    statusCode: number;
-    /**
-     * 开发者服务器返回的 HTTP Response Header
-     * @version 1.2.0
-     */
-    header: IData;
-  }
-
-  export interface RequestOptions extends BaseOptions {
-    /**
-     * 开发者服务器接口地址
-     */
-    url: string;
-
-    /**
-     * 请求的参数
-     */
-    data?: string | IData;
-
-    /**
-     * 设置请求的 header , header 中不能设置 Referer
-     */
-    header?: IData;
-
-    /**
-     * （需大写）有效值：OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-     */
-    methods?:
-      | 'OPTIONS'
-      | 'GET'
-      | 'HEAD'
-      | 'POST'
-      | 'PUT'
-      | 'DELETE'
-      | 'TRACE'
-      | 'CONNECT';
-
-    /**
-     * 默认为 json。如果设置了 dataType 为 json，则会尝试对响应的数据做一次 JSON.parse
-     */
-    dataType?: string;
-
-    /**
-     * 设置响应的数据类型。合法值：text、arraybuffer
-     * @version 1.7.0
-     */
-    responseType?: string;
-
-    /**
-     * 收到开发者服务成功返回的回调函数，res = {data: '开发者服务器返回的内容'}
-     */
-    success?: (res?: RequestResult) => void;
-  }
-
-  /**
-   * 返回一个 requestTask 对象，通过 requestTask，可中断请求任务。
-   * @version 1.4.0
-   */
-  export interface requestTask {
-    abort?: () => void;
-  }
-
-  /**
-   * 发起网络请求。`wx.request`发起的是https请求。**一个微信小程序，同时只能有5个网络请求连接**。
-   */
-  export function request(options: RequestOptions): requestTask | void;
-
-  export interface UploadFileResult {
-    /**
-     * 开发者服务器返回的数据
-     */
-    data: string;
-
-    /**
-     * HTTP状态码
-     */
-    statusCode: number;
-  }
-
-  /**
-   * 返回一个 uploadTask 对象，通过 uploadTask，可监听上传进度变化事件，以及取消上传任务。
-   * @version 1.4.0
-   */
-  export interface uploadTask {
-    onProgressUpdate?: (
-      callback: (res: onProgressUpdateResult) => void
-    ) => void;
-    abort?: () => void;
-  }
-
-  /**
-   * 返回一个 downloadTask 对象，通过 downloadTask，可监听上传进度变化事件，以及取消上传任务。
-   * @version 1.4.0
-   */
-  export interface downloadTask extends uploadTask {}
-
-  /**
-   * 进度变化
-   * @version 1.4.0
-   */
-  export interface onProgressUpdateResult {
-    /**
-     * 上传进度百分比
-     */
-    progress: number;
-
-    /**
-     * 已经上传的数据长度，单位 Bytes
-     */
-    totalBytesSent: number;
-
-    /**
-     * 预期需要上传的数据总长度，单位 Bytes
-     */
-    totalBytesExpectedToSend: number;
-  }
-
-  export interface UploadFileOptions extends BaseOptions {
-    /**
-     * 开发者服务器 url
-     */
-    url: string;
-
-    /**
-     * 要上传文件资源的路径
-     */
-    filePath: string;
-
-    /**
-     * 文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
-     */
-    name: string;
-
-    /**
-     * HTTP 请求 Header , header 中不能设置 Referer
-     */
-    header?: IData;
-
-    /**
-     * HTTP 请求中其他额外的 form data
-     */
-    formData?: IData;
-
-    /**
-     * 收到开发者服务成功返回的回调函数，res = {data: '开发者服务器返回的内容'}
-     */
-    success?: (res?: UploadFileResult) => void;
-  }
-
-  /**
-   * 将本地资源上传到开发者服务器。
-   * 如页面通过 [wx.chooseImage](#wx.chooseImage) 等接口获取到一个本地资源的临时文件路径后，可通过此接口将本地资源上传到指定服务器。
-   * 客户端发起一个 HTTPS POST 请求，其中 `Content-Type` 为 `multipart/form-data` 。
-   */
-  export function uploadFile(options: UploadFileOptions): uploadTask | void;
-
-  export interface DownloadFileResult {
-    /**
-     * 文件的临时路径
-     */
-    tempFilePath: string;
-
-    /**
-     * 开发者服务器返回的 HTTP 状态码
-     */
-    statusCode: number;
-  }
-
-  export interface DownloadFileOptions extends BaseOptions {
-    /**
-     * 下载资源的 url
-     */
-    url: string;
-
-    /**
-     * HTTP 请求 Header
-     */
-    header?: IData;
-
-    /**
-     * 下载成功后以 tempFilePath 的形式传给页面，res = {tempFilePath: '文件的临时路径'}
-     */
-    success?: (res: DownloadFileResult) => void;
-  }
-
-  /**
-   * 下载文件资源到本地。
-   * 客户端直接发起一个 HTTP GET 请求，返回文件的本地临时路径。
-   */
-  export function downloadFile(
-    options: DownloadFileOptions
-  ): downloadTask | void;
-
-  export interface ConnectSocketOptions extends BaseOptions {
-    /**
-     * 开发者服务器接口地址，必须是 wss 协议，且域名必须是后台配置的合法域名
-     */
-    url: string;
-
-    /**
-     * 请求的数据
-     */
-    data?: string;
-
-    /**
-     * HTTP Header , header 中不能设置 Referer
-     */
-    header?: IData;
-
-    /**
-     * 默认是GET，有效值为： OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-     */
-    methods?:
-      | 'OPTIONS'
-      | 'GET'
-      | 'HEAD'
-      | 'POST'
-      | 'PUT'
-      | 'DELETE'
-      | 'TRACE'
-      | 'CONNECT';
-
-    /**
-     * 子协议数组
-     * @version 1.4.0
-     */
-    protocols?: string[];
-  }
-
-  /**
-   * WebSocket 任务，可通过 wx.connectSocket() 接口创建返回。
-   * @version 1.7.0
-   */
-  export interface SocketTask extends BaseOptions {
-    /**
-     * 通过 WebSocket 连接发送数据。
-     */
-    send?: (options: SendSocketTaskOptions) => void;
-
-    /**
-     * 关闭 WebSocket 连接。
-     */
-    close?: (options: CloseSocketTaskOptions) => void;
-
-    /**
-     * 监听 WebSocket 连接打开事件。
-     */
-    onOpen?: (res: any) => void;
-
-    /**
-     * 监听 WebSocket 连接关闭事件。
-     */
-    onClose?: (res: any) => void;
-
-    /**
-     * 监听 WebSocket 连接打开事件。
-     */
-    onError?: (
-      res: {
-        errMsg: string;
-      }
-    ) => void;
-
-    onMessage?: (
-      data: {
-        errMsg: string | ArrayBuffer;
-      }
-    ) => void;
-  }
-
-  /**
-   * 创建一个 [WebSocket](https://developer.mozilla.org/zh-CN/docs/Web/API/WebSocket?t=1477656499061) 连接；
-   * 基础库 1.7.0 之前，一个微信小程序同时只能有一个 WebSocket 连接，如果当前已存在一个 WebSocket 连接，会自动关闭该连接，并重新创建一个 WebSocket 连接。
-   * 基础库版本 1.7.0 及以后，支持存在多个 WebSokcet 连接，每次成功调用 wx.connectSocket 会返回一个新的 SocketTask。
-   */
-  export function connectSocket(options: ConnectSocketOptions): SocketTask;
-
-  /**
-   * 监听WebSocket连接打开事件。
-   */
-  export function onSocketOpen(callback: BaseCallback): void;
-
-  /**
-   * 监听WebSocket错误。
-   */
-  export function onSocketError(callback: BaseCallback): void;
-
-  export interface SendSocketMessageOptions extends BaseOptions {
-    /**
-     * 需要发送的内容
-     */
-    data: string | ArrayBuffer;
-  }
-
-  /**
-   * 通过 WebSocket 连接发送数据，需要先 [wx.connectSocket](#wx.connectSocket)，并在 [wx.onSocketOpen](#wx.onSocketOpen) 回调之后才能发送。
-   */
-  export function sendSocketMessage(options: SendSocketMessageOptions): void;
-
-  export interface SocketMessageResponse {
-    /**
-     * 服务器返回的消息
-     */
-    data: string | any[];
-  }
-
-  /**
-   * 监听WebSocket接受到服务器的消息事件。
-   */
-  export function onSocketMessage(
-    callback: (res: SocketMessageResponse) => void
-  ): void;
-
-  /**
-   *
-   */
-  export interface CloseSocketOptions extends BaseOptions {
-    /**
-     * 一个数字值表示关闭连接的状态号，表示连接被关闭的原因。如果这个参数没有被指定，默认的取值是1000 （表示正常连接关闭）
-     * @version 1.4.0
-     */
-    code?: number;
-    /**
-     * 一个可读的字符串，表示连接被关闭的原因。这个字符串必须是不长于123字节的UTF-8 文本（不是字符）
-     * @version 1.4.0
-     */
-    reason?: string;
-  }
-
-  /**
-   * 关闭WebSocket连接。
-   */
-  export function closeSocket(options: CloseSocketOptions): void;
-
-  /**
-   * 通过 WebSocket 连接发送数据, 参数。
-   * @version 1.7.0
-   */
-  export interface SendSocketTaskOptions extends BaseOptions {
-    /**
-     * 需要发送的内容
-     */
-    data: string | ArrayBuffer;
-  }
-
-  /**
-   * 关闭 WebSocket 连接, 参数。
-   * @version 1.7.0
-   */
-  export interface CloseSocketTaskOptions extends BaseOptions {
-    /**
-     * 一个数字值表示关闭连接的状态号，表示连接被关闭的原因。如果这个参数没有被指定，默认的取值是1000 （表示正常连接关闭）
-     */
-    code?: number;
-
-    /**
-     * 一个可读的字符串，表示连接被关闭的原因。这个字符串必须是不长于123字节的UTF-8 文本（不是字符）
-     */
-    reason?: string;
-  }
-
-  /**
-   * 监听WebSocket关闭。
-   * @version 1.7.0
-   */
-  export function onSocketClose(callback: BaseCallback): void;
-
   // ---------------------------------- 媒体API列表 ----------------------------------
-
-  export interface ImageFile {
-    /**
-     * 本地文件路径
-     */
-    path: string;
-
-    /**
-     * 本地文件大小，单位：B
-     */
-    size: number;
-  }
-
-  export interface ChooseImageResult {
-    /**
-     * 本地文件路径列表
-     */
-    tempFilePaths: string[];
-
-    /**
-     * 图片的本地文件列表，每一项是一个 File 对象
-     * @version 1.2.0
-     */
-    tempFiles: ImageFile[];
-  }
-
-  export interface ChooseImageOptions extends BaseOptions {
-    /**
-     * 最多可以选择的图片张数，默认9
-     */
-    count?: number;
-
-    /**
-     * original 原图，compressed 压缩图，默认二者都有
-     */
-    sizeType?: string[];
-
-    /**
-     * album 从相册选图，camera 使用相机，默认二者都有
-     */
-    sourceType?: string[];
-
-    /**
-     * 成功则返回图片的本地文件路径列表 tempFilePaths
-     */
-    success: (res: ChooseImageResult) => void;
-  }
-
-  /**
-   * 从本地相册选择图片或使用相机拍照。
-   */
-  export function chooseImage(options: ChooseImageOptions): void;
-
-  export interface PreviewImageOptions extends BaseOptions {
-    /**
-     * 当前显示图片的链接，不填则默认为 urls 的第一张
-     */
-    current?: string;
-
-    /**
-     * 需要预览的图片链接列表
-     */
-    urls: string[];
-  }
-
-  /**
-   * 预览图片。
-   */
-  export function previewImage(options: PreviewImageOptions): void;
-
-  export interface GetImageInfoResult {
-    /**
-     * 图片宽度，单位px
-     */
-    width: number;
-
-    /**
-     * 图片高度 单位px
-     */
-    height: number;
-
-    /**
-     * 返回图片的本地路径
-     */
-    path: string;
-  }
-
-  export interface GetImageInfoOptions extends BaseOptions {
-    /**
-     * 图片的路径，可以是相对路径，临时文件路径，存储文件路径
-     */
-    src: string;
-
-    /**
-     * 接口调用成功的回调函数，包含图片信息
-     */
-    success?: (res: GetImageInfoResult) => void;
-  }
-
-  /**
-   * 获取图片信息
-   */
-  export function getImageInfo(options: GetImageInfoOptions): void;
-
-  export interface SaveImageToPhotosAlbumOptions extends SuccessOptions {
-    /**
-     * 图片文件路径，可以是临时文件路径也可以是永久文件路径，不支持网络图片路径
-     */
-    filePath: string;
-  }
-
-  /**
-   * 保存图片到系统相册。需要用户授权 scope.writePhotosAlbum
-   * @version 1.2.0
-   */
-  export function saveImageToPhotosAlbum(
-    options: SaveImageToPhotosAlbumOptions
-  ): void;
-
-  export interface StartRecordResult {
-    /**
-     * 录音文件的临时路径
-     */
-    tempFilePath: string;
-  }
-
-  export interface StartRecordOptions extends BaseOptions {
-    /**
-     * 录音成功后调用，返回录音文件的临时文件路径，res = {tempFilePath: '录音文件的临时路径'}
-     */
-    success?: (res: StartRecordResult) => void;
-  }
-
-  /**
-   * 开始录音。当主动调用 `wx.stopRecord`，或者录音超过1分钟时自动结束录音，返回录音文件的临时文件路径。
-   * 当用户离开小程序时，此接口无法调用。
-   * 需要用户授权 scope.record
-   * @deprecated 注意：1.6.0 版本开始，本接口不再维护。建议使用能力更强的 wx.getRecorderManager 接口
-   */
-  export function startRecord(options: StartRecordOptions): void;
-
-  /**
-   *​ 主动调用停止录音。
-   */
-  export function stopRecord(): void;
-
-  export interface RecorderManagerStartOptions {
-    /**
-     * 指定录音的时长，单位 ms ，如果传入了合法的 duration ，在到达指定的 duration 后会自动停止录音，最大值 600000（10 分钟）,默认值 60000（1 分钟）
-     */
-    duration?: number;
-    /**
-     * 采样率，有效值 8000/16000/44100
-     */
-    sampleRate?: number;
-    /**
-     * 录音通道数，有效值 1/2
-     */
-    numberOfChannels?: number;
-    /**
-     * 编码码率，有效值见下表格
-     */
-    encodeBitRate?: number;
-    /**
-     * 音频格式，有效值 aac/mp3
-     */
-    format?: string;
-    /**
-     * 指定帧大小，单位 KB。传入 frameSize 后，每录制指定帧大小的内容后，会回调录制的文件内容，不指定则不会回调。暂仅支持 mp3 格式。
-     */
-    frameSize?: number;
-  }
-
-  export interface RecorderManagerStopCallback {
-    /**
-     * 录音文件的临时路径
-     */
-    tempFilePath: string;
-  }
-
-  export interface RecorderManagerFrameRecordedCallback {
-    /**
-     * 录音分片结果数据
-     */
-    frameBuffer: ArrayBuffer;
-    /**
-     * 当前帧是否正常录音结束前的最后一帧
-     */
-    isLastFrame: boolean;
-  }
-
-  export interface RecorderManagerErrorCallback {
-    /**
-     * 错误信息
-     */
-    errMsg: string;
-  }
-
-  /**
-   * 全局唯一的录音管理器
-   */
-  export interface recorderManager {
-    /**
-     * 开始录音
-     * @param {wx.RecorderManagerStartOptions} options
-     */
-    start(options: RecorderManagerStartOptions): void;
-
-    /**
-     * 暂停录音
-     */
-    pause(): void;
-
-    /**
-     * 继续录音
-     */
-    resume(): void;
-
-    /**
-     * 停止录音
-     */
-    stop(): void;
-
-    /**
-     * 录音开始事件
-     * @param {BaseCallback} callback
-     */
-    onStart(callback: BaseCallback): void;
-
-    /**
-     * 录音暂停事件
-     * @param {BaseCallback} callback
-     */
-    onPause(callback: BaseCallback): void;
-
-    /**
-     * 录音停止事件，会回调文件地址
-     * @param {RecorderManagerStopCallback} callback
-     */
-    onStop(callback: (res: RecorderManagerStopCallback) => void): void;
-
-    /**
-     * 已录制完指定帧大小的文件，会回调录音分片结果数据。如果设置了 frameSize ，则会回调此事件
-     * @param {RecorderManagerFrameRecordedCallback} callback
-     */
-    onFrameRecorded(
-      callback: (res: RecorderManagerFrameRecordedCallback) => void
-    ): void;
-
-    /**
-     * 录音错误事件, 会回调错误信息
-     * @param {RecorderManagerErrorCallback} callback
-     */
-    onError(callback: (res: RecorderManagerErrorCallback) => void): void;
-  }
-
-  /**
-   * 获取全局唯一的录音管理器 recorderManager。
-   * @version 1.6.0
-   * @returns recorderManager
-   */
-  export function getRecorderManager(): recorderManager;
-
-  export interface PlayVoiceOptions extends BaseOptions {
-    /**
-     * 需要播放的语音文件的文件路径
-     */
-    filePath: string;
-    /**
-     * 指定录音时长，到达指定的录音时长后会自动停止录音，单位：秒，默认值：60
-     * @version 1.6.0
-     */
-    duration?: number;
-  }
-
-  /**
-   * 开始播放语音，同时只允许一个语音文件正在播放，如果前一个语音文件还没播放完，将中断前一个语音播放。
-   * @deprecated 注意：1.6.0 版本开始，本接口不再维护。建议使用能力更强的 wx.createInnerAudioContext 接口
-   */
-  export function playVoice(options: PlayVoiceOptions): void;
-
-  /**
-   * 暂停正在播放的语音。
-   * 再次调用wx.playVoice播放同一个文件时，会从暂停处开始播放。如果想从头开始播放，需要先调用 wx.stopVoice。
-   */
-  export function pauseVoice(): void;
-
-  /**
-   * 结束播放语音。
-   */
-  export function stopVoice(): void;
-
-  export interface GetBackgroundAudioPlayerStateResult {
-    /**
-     * 选定音频的长度（单位：s），只有在当前有音乐播放时返回
-     */
-    duration: number;
-
-    /**
-     * 选定音频的播放位置（单位：s），只有在当前有音乐播放时返回
-     */
-    currentPosition: number;
-
-    /**
-     * 播放状态（2：没有音乐在播放，1：播放中，0：暂停中）
-     */
-    status: number;
-
-    /**
-     * 音频的下载进度（整数，80 代表 80%），只有在当前有音乐播放时返回
-     */
-    downloadPercent: number;
-
-    /**
-     * 歌曲数据链接，只有在当前有音乐播放时返回
-     */
-    dataUrl: string;
-  }
-
-  export interface GetBackgroundAudioPlayerStateOptions extends BaseOptions {
-    /**
-     * 接口调用成功的回调函数
-     */
-    success?: (res: GetBackgroundAudioPlayerStateResult) => void;
-  }
-
-  /**
-   * 获取后台音乐播放状态。
-   * @deprecated 注意：1.2.0 版本开始，本接口不再维护。建议使用能力更强的 wx.getBackgroundAudioManager 接口
-   */
-  export function getBackgroundAudioPlayerState(
-    options: GetBackgroundAudioPlayerStateOptions
-  ): void;
-
-  export interface PlayBackgroundAudioOptions extends BaseOptions {
-    /**
-     * 音乐链接, 目前支持的格式有 m4a, aac, mp3, wav
-     */
-    dataUrl: string;
-
-    /**
-     * 音乐标题
-     */
-    title?: string;
-
-    /**
-     * 封面URL
-     */
-    coverImgUrl?: string;
-  }
-
-  /**
-   * 使用后台播放器播放音乐，对于微信客户端来说，只能同时有一个后台音乐在播放。
-   * 当用户离开小程序后，音乐将暂停播放；
-   * 当用户点击“显示在聊天顶部”时，音乐不会暂停播放；
-   * 当用户在其他小程序占用了音乐播放器，原有小程序内的音乐将停止播放。
-   */
-  export function playBackgroundAudio(
-    options: PlayBackgroundAudioOptions
-  ): void;
-
-  /**
-   * 暂停播放音乐。
-   */
-  export function pauseBackgroundAudio(): void;
-
-  export interface SeekBackgroundAudioOptions extends BaseOptions {
-    /**
-     * 音乐位置，单位：秒
-     */
-    position: number;
-  }
-
-  /**
-   * 控制音乐播放进度。
-   */
-  export function seekBackgroundAudio(
-    options: SeekBackgroundAudioOptions
-  ): void;
-
-  /**
-   * 停止播放音乐。
-   */
-  export function stopBackgroundAudio(): void;
-
-  /**
-   * 监听音乐播放。
-   */
-  export function onBackgroundAudioPlay(callback: BaseCallback): void;
-
-  /**
-   * 监听音乐暂停。
-   */
-  export function onBackgroundAudioPause(callback: BaseCallback): void;
-
-  /**
-   * 监听音乐停止。
-   */
-  export function onBackgroundAudioStop(callback: BaseCallback): void;
-
-  export interface backgroundAudioManager {
-    /**
-     * 当前音频的长度（单位：s），只有在当前有合法的 src 时返回
-     */
-    readonly duration: number;
-    /**
-     * 当前音频的播放位置（单位：s），只有在当前有合法的 src 时返回
-     */
-    readonly currentTime: number;
-    /**
-     * 当前是是否暂停或停止状态，true 表示暂停或停止，false 表示正在播放
-     */
-    readonly paused: Boolean;
-    /**
-     * 音频的数据源，默认为空字符串，当设置了新的 src 时，会自动开始播放 ，目前支持的格式有 m4a, aac, mp3, wav
-     */
-    src: string;
-    /**
-     * 音频开始播放的位置（单位：s）
-     */
-    startTime: number;
-    /**
-     * 音频缓冲的时间点，仅保证当前播放时间点到此时间点内容已缓冲。
-     */
-    buffered: number;
-    /**
-     * 音频标题，用于做原生音频播放器音频标题。原生音频播放器中的分享功能，分享出去的卡片标题，也将使用该值。
-     */
-    title: number;
-    /**
-     * 专辑名，原生音频播放器中的分享功能，分享出去的卡片简介，也将使用该值。
-     */
-    epname: string;
-    /**
-     * 歌手名，原生音频播放器中的分享功能，分享出去的卡片简介，也将使用该值。
-     */
-    singer: string;
-    /**
-     * 封面图url，用于做原生音频播放器背景图。原生音频播放器中的分享功能，分享出去的卡片配图及背景也将使用该图。
-     */
-    coverImgUrl: string;
-    /**
-     * 页面链接，原生音频播放器中的分享功能，分享出去的卡片简介，也将使用该值。
-     */
-    webUrl: string;
-
-    /**
-     * 播放
-     */
-    play(): void;
-
-    /**
-     * 暂停
-     */
-    pause(): void;
-
-    /**
-     * 停止
-     */
-    stop(): void;
-
-    /**
-     * 跳转到指定位置，单位 s
-     * @param {number} position
-     */
-    seek(position: number): void;
-
-    /**
-     * 背景音频进入可以播放状态，但不保证后面可以流畅播放
-     * @param {BaseCallback} callback
-     */
-    onCanplay(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放事件
-     * @param {BaseCallback} callback
-     */
-    onPlay(callback: BaseCallback): void;
-
-    /**
-     * 背景音频暂停事件
-     * @param {BaseCallback} callback
-     */
-    onPause(callback: BaseCallback): void;
-
-    /**
-     * 背景音频停止事件
-     * @param {BaseCallback} callback
-     */
-    onStop(callback: BaseCallback): void;
-
-    /**
-     * 背景音频自然播放结束事件
-     * @param {BaseCallback} callback
-     */
-    onEnded(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放进度更新事件
-     * @param {BaseCallback} callback
-     */
-    onTimeUpdate(callback: BaseCallback): void;
-
-    /**
-     * 用户在系统音乐播放面板点击上一曲事件（iOS only）
-     * @param {BaseCallback} callback
-     */
-    onPrev(callback: BaseCallback): void;
-
-    /**
-     * 用户在系统音乐播放面板点击下一曲事件（iOS only）
-     * @param {BaseCallback} callback
-     */
-    onNext(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放错误事件
-     * @param {BaseCallback} callback
-     */
-    onError(callback: BaseCallback): void;
-
-    /**
-     * 音频加载中事件，当音频因为数据不足，需要停下来加载时会触发
-     * @param {BaseCallback} callback
-     */
-    onWaiting(callback: BaseCallback): void;
-  }
-
-  /**
-   * 获取全局唯一的背景音频管理器
-   * @returns backgroundAudioManager
-   */
-  export function getBackgroundAudioManager(): backgroundAudioManager;
-
-  /**
-   * `audioContext` 通过 audioId 跟一个 audio 组件绑定，通过它可以操作一个 audio 组件。
-   */
-  export interface AudioContext {
-    /**
-     * 音频的地址
-     * @param {string} src
-     */
-    setSrc(src: string): void;
-
-    /**
-     * 播放
-     */
-    play(): void;
-
-    /**
-     * 暂停
-     */
-    pause(): void;
-
-    /**
-     * 跳转到指定位置，单位 s
-     * @param {number} position
-     */
-    seek(position: number): void;
-  }
-
-  /**
-   * 创建并返回 audio 上下文 audioContext 对象。
-   * 在自定义组件下，第二个参数传入组件实例this，以操作组件内 <audio/> 组件
-   * @deprecated 注意：1.6.0 版本开始，本接口不再维护。建议使用能力更强的 wx.createInnerAudioContext 接口
-   */
-  export function createAudioContext(audioId: string): AudioContext;
-
-  export interface innerAudioContext {
-    /**
-     * 音频的数据链接，用于直接播放。
-     */
-    src: string;
-    /**
-     * 开始播放的位置（单位：s），默认 0
-     */
-    startTime: number;
-    /**
-     * 是否自动开始播放，默认 false
-     */
-    autoplay: boolean;
-    /**
-     * 是否循环播放，默认 false
-     */
-    loop: boolean;
-    /**
-     * 是否遵循系统静音开关，当此参数为 false 时，即使用户打开了静音开关，也能继续发出声音，默认值 true
-     */
-    obeyMuteSwitch: boolean;
-    /**
-     * 当前音频的长度（单位：s），只有在当前有合法的 src 时返回
-     */
-    readonly duration: number;
-    /**
-     * 当前音频的播放位置（单位：s），只有在当前有合法的 src 时返回，时间不取整，保留小数点后 6 位
-     */
-    readonly currentTime: number;
-    /**
-     * 当前是是否暂停或停止状态，true 表示暂停或停止，false 表示正在播放
-     */
-    readonly paused: boolean;
-    /**
-     * 音频缓冲的时间点，仅保证当前播放时间点到此时间点内容已缓冲。
-     */
-    readonly buffered: number;
-
-    /**
-     * 播放
-     */
-    play(): void;
-
-    /**
-     * 暂停
-     */
-    pause(): void;
-
-    /**
-     * 停止
-     */
-    stop(): void;
-
-    /**
-     * 跳转到指定位置，单位 s
-     * @param {number} position
-     */
-    seek(position: number): void;
-
-    /**
-     * 销毁当前实例
-     */
-    destroy(): void;
-
-    /**
-     * 背景音频进入可以播放状态，但不保证后面可以流畅播放
-     * @param {BaseCallback} callback
-     */
-    onCanplay(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放事件
-     * @param {BaseCallback} callback
-     */
-    onPlay(callback: BaseCallback): void;
-
-    /**
-     * 背景音频暂停事件
-     * @param {BaseCallback} callback
-     */
-    onPause(callback: BaseCallback): void;
-
-    /**
-     * 背景音频停止事件
-     * @param {BaseCallback} callback
-     */
-    onStop(callback: BaseCallback): void;
-
-    /**
-     * 背景音频自然播放结束事件
-     * @param {BaseCallback} callback
-     */
-    onEnded(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放进度更新事件
-     * @param {BaseCallback} callback
-     */
-    onTimeUpdate(callback: BaseCallback): void;
-
-    /**
-     * 背景音频播放错误事件
-     * @param {BaseCallback} callback
-     */
-    onError(callback: BaseCallback): void;
-
-    /**
-     * 音频加载中事件，当音频因为数据不足，需要停下来加载时会触发
-     * @param {BaseCallback} callback
-     */
-    onWaiting(callback: BaseCallback): void;
-
-    /**
-     * 音频进行 seek 操作事件
-     * @param {BaseCallback} callback
-     */
-    onSeeking(callback: BaseCallback): void;
-
-    /**
-     * 音频完成 seek 操作事件
-     * @param {BaseCallback} callback
-     */
-    onSeeked(callback: BaseCallback): void;
-  }
-
-  /**
-   * 创建并返回内部 audio 上下文 innerAudioContext 对象。
-   * 本接口是 wx.createAudioContext 升级版。
-   * @version 1.6.0
-   */
-  export function createInnerAudioContext(): innerAudioContext;
-
-  export interface ChooseVideoResult {
-    /**
-     * 选定视频的临时文件路径
-     */
-    tempFilePath: string;
-
-    /**
-     * 选定视频的时间长度
-     */
-    duration: number;
-
-    /**
-     * 选定视频的数据量大小
-     */
-    size: number;
-
-    /**
-     * 返回选定视频的长
-     */
-    height: number;
-
-    /**
-     * 返回选定视频的宽
-     */
-    width: number;
-  }
-
-  export interface ChooseVideoOptions extends BaseOptions {
-    /**
-     * album 从相册选视频，camera 使用相机拍摄，默认为：['album', 'camera']
-     */
-    sourceType?: string[];
-    /**
-     * 是否压缩所选的视频源文件，默认值为true，需要压缩
-     */
-    compressed: boolean;
-    /**
-     * 拍摄视频最长拍摄时间，单位秒。最长支持60秒
-     */
-    maxDuration?: number;
-    /**
-     * 前置或者后置摄像头，默认为前后都有，即：['front', 'back']
-     */
-    camera?: string[];
-
-    /**
-     * 接口调用成功，返回视频文件的临时文件路径
-     */
-    success?: (res: ChooseVideoResult) => void;
-  }
-
-  /**
-   * 拍摄视频或从手机相册中选视频，返回视频的临时文件路径。
-   */
-  export function chooseVideo(options: ChooseVideoOptions): void;
-
-  export interface SaveVideoToPhotosAlbumOptions extends SuccessOptions {
-    /**
-     * 视频文件路径，可以是临时文件路径也可以是永久文件路径
-     */
-    filePath: string;
-  }
-
-  /**
-   * 保存视频到系统相册。需要用户授权 scope.writePhotosAlbum
-   * @param {SaveVideoToPhotosAlbumOptions} options
-   * @version 1.2.0
-   */
-  export function saveVideoToPhotosAlbum(
-    options: SaveVideoToPhotosAlbumOptions
-  ): void;
-
-  /**
-   * `videoContext` 通过 videoId 跟一个 video 组件绑定，通过它可以操作一个 video 组件。
-   */
-  export interface VideoContext {
-    /**
-     * 播放
-     */
-    play(): void;
-
-    /**
-     * 暂停
-     */
-    pause(): void;
-
-    /**
-     * 跳转到指定位置，单位 s
-     * @param {number} position
-     */
-    seek(position: number): void;
-
-    /**
-     * 发送弹幕，danmu 包含两个属性 text, color
-     * @param {{text: string, color: string}} danmu
-     */
-    sendDanmu(danmu: { text: string; color: string }): void;
-
-    /**
-     * 设置倍速播放，支持的倍率有 0.5/0.8/1.0/1.25/1.5  1.4.0
-     * @param {number} rate
-     */
-    playbackRate(rate: number): void;
-
-    /**
-     * 进入全屏
-     * @param {number} direction 1.7.0起支持
-     * @version 1.4.0
-     */
-    requestFullScreen(direction: number): void;
-
-    /**
-     * 退出全屏
-     */
-    exitFullScreen(): void;
-  }
-
-  /**
-   * 创建并返回 video 上下文 videoContext 对象。在自定义组件下，第二个参数传入组件实例this，以操作组件内 <video/> 组件
-   */
-  export function createVideoContext(videoId: string): VideoContext;
-
-  export interface cameraContextTakePhoto extends BaseOptions {
-    /**
-     * 成像质量，值为high, normal, low，默认normal
-     */
-    quality?: string;
-    /**
-     * 接口调用成功的回调函数
-     * @param {{tempImagePath: string}} res
-     */
-    success?: (
-      res: {
-        tempImagePath: string;
-      }
-    ) => void;
-  }
-
-  export interface cameraContextStartRecord extends BaseOptions {
-    /**
-     * 超过30s或页面onHide时会结束录像
-     * @param {{tempThumbPath: string, tempVideoPath: string}} res
-     */
-    timeoutCallback?: (
-      res: {
-        tempThumbPath: string;
-        tempVideoPath: string;
-      }
-    ) => void;
-  }
-
-  export interface cameraContextStopRecord extends BaseOptions {
-    /**
-     * 接口调用成功的回调函数
-     * @param {{tempThumbPath: string, tempVideoPath: string}} res
-     */
-    success?: (
-      res: {
-        tempThumbPath: string;
-        tempVideoPath: string;
-      }
-    ) => void;
-  }
-
-  export interface cameraContext {
-    /**
-     * 拍照，可指定质量，成功则返回图片
-     */
-    takePhoto(options: cameraContextTakePhoto): void;
-
-    /**
-     * 开始录像
-     */
-    startRecord(options: cameraContextStartRecord): void;
-
-    /**
-     * 结束录像，成功则返回封面与视频
-     */
-    stopRecord(options: cameraContextStopRecord): void;
-  }
-
-  /**
-   * 创建并返回 camera 上下文 cameraContext 对象，cameraContext 与页面的 camera 组件绑定，
-   * 一个页面只能有一个camera，通过它可以操作对应的 <camera/> 组件。
-   * 在自定义组件下，第一个参数传入组件实例this，以操作组件内 <camera/> 组件
-   * @version 1.6.0
-   * @param context 当前组件实例
-   * @returns {wx.cameraContext}
-   */
-  export function createCameraContext(context: any): cameraContext;
-
-  export interface livePlayerContextRequestFullScreenOptions
-    extends BaseOptions {
-    /**
-     * 有效值为 0（正常竖向）, 90（屏幕逆时针90度）, -90（屏幕顺时针90度）
-     */
-    direction?: number;
-  }
-
-  export interface livePlayerContext {
-    /**
-     * 播放
-     */
-    play(options: BaseOptions): void;
-
-    /**
-     * 停止
-     */
-    stop(options: BaseOptions): void;
-
-    /**
-     * 静音
-     */
-    mute(options: BaseOptions): void;
-
-    /**
-     * 进入全屏
-     * @param {wx.livePlayerContextRequestFullScreenOptions} options
-     */
-    requestFullScreen(options: livePlayerContextRequestFullScreenOptions): void;
-
-    /**
-     * 退出全屏
-     */
-    exitFullScreen(options: BaseOptions): void;
-  }
-
-  /**
-   * 操作对应的 <live-player/> 组件。
-   * 创建并返回 live-player 上下文 LivePlayerContext 对象。
-   * 在自定义组件下，第二个参数传入组件实例this，以操作组件内 <live-player/> 组件
-   * @param {number} domId
-   * @param context 当前组件实例
-   * @returns {wx.livePlayerContext}
-   * @version 1.7.0
-   */
-  export function createLivePlayerContext(
-    domId: number,
-    context: any
-  ): livePlayerContext;
-
-  export interface livePusherContext {
-    /**
-     * 播放推流
-     */
-    play(options: BaseOptions): void;
-
-    /**
-     * 停止推流
-     */
-    stop(options: BaseOptions): void;
-
-    /**
-     * 暂停推流
-     */
-    pause(options: BaseOptions): void;
-
-    /**
-     * 恢复推流
-     */
-    resume(options: BaseOptions): void;
-
-    /**
-     * 切换前后摄像头
-     */
-    switchCamera(options: BaseOptions): void;
-  }
-
-  /**
-   * 创建并返回 live-pusher 上下文 LivePusherContext 对象，
-   * LivePusherContext 与页面的 <live-pusher /> 组件绑定，一个页面只能有一个 live-pusher，
-   * 通过它可以操作对应的 <live-pusher/> 组件。
-   * 在自定义组件下，第一个参数传入组件实例this，以操作组件内 <live-pusher/> 组件
-   * @param context 当前组件实例
-   * @returns {wx.livePusherContext}
-   * @version 1.7.0
-   */
-  export function createLivePusherContext(context: any): livePusherContext;
 
   export interface SaveFileOptions extends BaseOptions {
     /**
@@ -1609,7 +146,7 @@ declare namespace wx {
     filePath: string;
     /**
      * 文件类型，指定文件类型打开文件，有效值 doc, xls, ppt, pdf, docx, xlsx, pptx
-     * @version 1.4.0
+     * @since 1.4.0
      */
     fileType?: string;
   }
@@ -1763,19 +300,19 @@ declare namespace wx {
     accuracy: number;
     /**
      * 高度，单位 m
-     * @version 1.2.0
+     * @since 1.2.0
      */
     altitude: number;
 
     /**
      * 垂直精度，单位 m（Android 无法获取，返回 0）
-     * @version 1.2.0
+     * @since 1.2.0
      */
     verticalAccuracy: number;
 
     /**
      * 水平精度，单位 m
-     * @version 1.2.0
+     * @since 1.2.0
      */
     horizontalAccuracy: number;
   }
@@ -1788,7 +325,7 @@ declare namespace wx {
 
     /**
      * 传入 true 会返回高度信息，由于获取高度需要较高精确度，会减慢接口返回速度
-     * @version 1.6.0
+     * @since 1.6.0
      */
     altitude: boolean;
     /**
@@ -1944,28 +481,28 @@ declare namespace wx {
     /**
      * 平移marker，带动画
      * @param {wx.MapTranslateMarkerOptions} options
-     * @version 1.2.0
+     * @since 1.2.0
      */
     translateMarker(options: MapTranslateMarkerOptions): void;
 
     /**
      * 缩放视野展示所有经纬度
      * @param {wx.MapIncludePointsOptions} options
-     * @version 1.2.0
+     * @since 1.2.0
      */
     includePoints(options: MapIncludePointsOptions): void;
 
     /**
      * 获取当前地图的视野范围
      * @param {wx.MapGetRegionOptions} options
-     * @version 1.4.0
+     * @since 1.4.0
      */
     getRegion(options: MapGetRegionOptions): void;
 
     /**
      * 获取当前地图的缩放级别
      * @param {wx.MapGetScaleOptions} options
-     * @version 1.4.0
+     * @since 1.4.0
      */
     getScale(options: MapGetScaleOptions): void;
   }
@@ -1984,7 +521,7 @@ declare namespace wx {
   export interface GetSystemInfoResult {
     /**
      * 手机品牌
-     * @version 1.5.0
+     * @since 1.5.0
      */
     brand: string;
     /**
@@ -1998,12 +535,12 @@ declare namespace wx {
     pixelRatio: number;
     /**
      * 屏幕宽度
-     * @version 1.1.0
+     * @since 1.1.0
      */
     screenWidth: number;
     /**
      * 屏幕高度
-     * @version 1.1.0
+     * @since 1.1.0
      */
     screenHeight: number;
 
@@ -2019,7 +556,7 @@ declare namespace wx {
 
     /**
      * 状态栏的高度
-     * @version 1.9.0
+     * @since 1.9.0
      */
     statusBarHeight?: number;
 
@@ -2044,12 +581,12 @@ declare namespace wx {
     platform: string;
     /**
      * 用户字体大小设置。以“我-设置-通用-字体大小”中的设置为准，单位：px
-     * @version 1.5.0
+     * @since 1.5.0
      */
     fontSizeSetting: number;
     /**
      * 客户端基础库版本
-     * @version 1.1.0
+     * @since 1.1.0
      */
     SDKVersion: string;
   }
@@ -2111,7 +648,7 @@ declare namespace wx {
 
   /**
    * 监听网络状态变化。
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function onNetworkStatusChange(
     callback: (res: OnNetworkStatusChangeResult) => void
@@ -2155,6 +692,78 @@ declare namespace wx {
     callback: (res: CompassChangeResponse) => void
   ): void;
 
+  export interface IBluetoothAdapterStateChangeResponse {
+    /** 蓝牙适配器是否可用 */
+    available: boolean;
+    /** 蓝牙适配器是否处于搜索状态  */
+    discovering: boolean;
+  }
+
+  /**
+   * 监听蓝牙适配器状态变化事件
+   * @param callback
+   */
+  export function onBluetoothAdapterStateChange(
+    callback: (res: IBluetoothAdapterStateChangeResponse) => void
+  ): void;
+
+  /**
+   * 蓝牙设备
+   */
+  export interface IBluetoothDevice {
+    /**
+     * 蓝牙设备名称，某些设备可能没有
+     */
+    name: string;
+    /**
+     * 用于区分设备的 id
+     */
+    deviceId: string;
+    /**
+     * 当前蓝牙设备的信号强度
+     */
+    RSSI: number;
+    /**
+     * 当前蓝牙设备的广播数据段中的 ManufacturerData 数据段。
+     */
+    advertisData: ArrayBuffer;
+    /**
+     * 当前蓝牙设备的广播数据段中的 ServiceUUIDs 数据段
+     */
+    advertisServiceUUIDs: string[];
+    /**
+     * 当前蓝牙设备的广播数据段中的 LocalName 数据段
+     */
+    localName: string;
+    /**
+     * 当前蓝牙设备的广播数据段中的 ServiceData 数据段
+     */
+    serviceData: ArrayBuffer;
+  }
+
+  /**
+   * 监听寻找到新设备的事件
+   * @param callback
+   */
+  export function onBluetoothDeviceFound(
+    callback: (res: IBluetoothDevice[]) => void
+  ): void;
+
+  export interface IBLEConnectionStateChangeResponse {
+    /** 蓝牙设备ID */
+    deviceId: string;
+    /** 是否处于已连接状态 */
+    connected: boolean;
+  }
+
+  /**
+   * 监听低功耗蓝牙连接状态的改变事件。包括开发者主动连接或断开连接，设备丢失，连接异常断开等等
+   * @param callback
+   */
+  export function onBLEConnectionStateChange(
+    callback: (res: IBLEConnectionStateChangeResponse) => void
+  ): void;
+
   export interface MakePhoneCallOptions {
     /**
      * 需要拨打的电话号码
@@ -2192,12 +801,12 @@ declare namespace wx {
   export interface ScanCodeOptions extends BaseOptions {
     /**
      * 是否只能从相机扫码，不允许从相册选择图片
-     * @version 1.2.0
+     * @since 1.2.0
      */
     onlyFromCamera: boolean;
     /**
      * 扫码类型，参数类型是数组，二维码是'qrCode'，一维码是'barCode'，DataMatrix是‘datamatrix’，pdf417是‘pdf417’。
-     * @version 1.7.0
+     * @since 1.7.0
      */
     scanType: string[];
     /**
@@ -2221,14 +830,14 @@ declare namespace wx {
   /**
    * 设置系统剪贴板的内容
    * @param {SetClipboardDataOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function setClipboardData(options: SetClipboardDataOptions): void;
 
   /**
    * 获取系统剪贴板内容
    * @param {wx.SuccessOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function getClipboardData(options: SuccessOptions): void;
 
@@ -2242,7 +851,7 @@ declare namespace wx {
 
     /**
      * 图标，只支持"success"、"loading"
-     * 'none' @version 1.9.0
+     * 'none' @since 1.9.0
      */
     icon?: 'success' | 'loading' | 'none';
 
@@ -2281,7 +890,7 @@ declare namespace wx {
   /**
    * 显示 loading 提示框, 需主动调用 wx.hideLoading 才能关闭提示框
    * @param {ShowLoadingOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function showLoading(options: ShowLoadingOptions): void;
 
@@ -2292,7 +901,7 @@ declare namespace wx {
 
   /**
    * 隐藏 loading 提示框
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function hideLoading(): void;
 
@@ -2445,7 +1054,7 @@ declare namespace wx {
   /**
    * 设置导航条颜色，动画
    * @param {SetNavigationBarColorOptions} options
-   * @version 1.4.0
+   * @since 1.4.0
    */
   export function setNavigationBarColor(
     options: SetNavigationBarColorOptions
@@ -2465,7 +1074,7 @@ declare namespace wx {
   /**
    * 为 tabBar 某一项的右上角添加文本
    * @param {SetTabBarBadgeOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function setTabBarBadge(options: SetTabBarBadgeOptions): void;
 
@@ -2479,21 +1088,21 @@ declare namespace wx {
   /**
    * 移除 tabBar 某一项右上角的文本
    * @param {RemoveTabBarBadgeOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function removeTabBarBadge(options: RemoveTabBarBadgeOptions): void;
 
   /**
    * 显示 tabBar 某一项的右上角的红点
    * @param {BaseOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function showTabBarRedDot(options: BaseOptions): void;
 
   /**
    * 隐藏 tabBar 某一项的右上角的红点
    * @param {BaseOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function hideTabBarRedDot(options: BaseOptions): void;
 
@@ -2519,7 +1128,7 @@ declare namespace wx {
   /**
    * 动态设置 tabBar 的整体样式
    * @param {SetTabBarStyleOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function setTabBarStyle(options: SetTabBarStyleOptions): void;
 
@@ -2545,7 +1154,7 @@ declare namespace wx {
   /**
    * 动态设置 tabBar 某一项的内容
    * @param {SetTabBarItemOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function setTabBarItem(options: SetTabBarItemOptions): void;
 
@@ -2559,14 +1168,14 @@ declare namespace wx {
   /**
    * 隐藏 tabBar
    * @param {HasShowTabBarOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function hideTabBar(options: HasShowTabBarOptions): void;
 
   /**
    * 显示 tabBar
    * @param {HasShowTabBarOptions} options
-   * @version 1.9.0
+   * @since 1.9.0
    */
   export function showTabBar(options: HasShowTabBarOptions): void;
 
@@ -2608,7 +1217,7 @@ declare namespace wx {
   /**
    * 关闭所有页面，打开到应用内的某个页面。
    * @param {wx.NavigateToOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function reLaunch(options: NavigateToOptions): void;
 
@@ -2899,7 +1508,7 @@ declare namespace wx {
 
     /**
      * clip() 方法从原始画布中剪切任意形状和尺寸。一旦剪切了某个区域，则所有之后的绘图都会被限制在被剪切的区域内（不能访问画布上的其他区域）。可以在使用 clip() 方法前通过使用 save() 方法对当前画布区域进行保存，并在以后的任意时间对其进行恢复（通过 restore() 方法）。
-     * @version 1.6.0
+     * @since 1.6.0
      */
     clip(): void;
 
@@ -3082,7 +1691,7 @@ declare namespace wx {
 
     /**
      * 用于设置文字的水平对齐
-     * @version 1.4.0
+     * @since 1.4.0
      * @param {TextBaseLineOptions} textBaseline
      * @memberof CanvasContext
      */
@@ -3131,7 +1740,7 @@ declare namespace wx {
      *
      * @param {string} text
      * @returns {{ width: number }}
-     * @version 1.9.90
+     * @since 1.9.90
      * @memberof CanvasContext
      */
     measureText(text: string): { width: number };
@@ -3276,7 +1885,7 @@ declare namespace wx {
   /**
    * 开始下拉刷新，调用后触发下拉刷新动画，效果与用户手动下拉刷新一致
    * @param {SuccessOptions} options
-   * @version 1.5.0
+   * @since 1.5.0
    */
   export function startPullDownRefresh(options: SuccessOptions): void;
 
@@ -3416,7 +2025,7 @@ declare namespace wx {
      * 将选择器的选取范围更改为自定义组件component内。
      * @param context
      * @returns {wx.SelectQuery}
-     * @version 1.6.0
+     * @since 1.6.0
      */
     in(context: any): SelectQuery;
 
@@ -3450,7 +2059,7 @@ declare namespace wx {
   /**
    * 返回一个SelectorQuery对象实例。
    * @returns {SelectQuery}
-   * @version 1.4.0
+   * @since 1.4.0
    */
   export function createSelectorQuery(): SelectQuery;
 
@@ -3466,14 +2075,14 @@ declare namespace wx {
   /**
    * 获取第三方平台自定义的数据字段。
    * @param {GetExtConfigOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function getExtConfig(options: GetExtConfigOptions): void;
 
   /**
    * 获取第三方平台自定义的数据字段的同步接口。
    * @returns {{extConfig: wx.IData}}
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function getExtConfigSync(): {
     extConfig: IData;
@@ -3597,12 +2206,12 @@ declare namespace wx {
   export interface GetUserInfoOptions extends BaseOptions {
     /**
      * 是否带上登录态信息
-     * @version 1.1.0
+     * @since 1.1.0
      */
     withCredentials?: boolean;
     /**
      * 指定返回用户信息的语言，zh_CN 简体中文，zh_TW 繁体中文，en 英文。默认为en。
-     * @version 1.3.0
+     * @since 1.3.0
      */
     lang?: string;
     /**
@@ -3658,21 +2267,21 @@ declare namespace wx {
   /**
    * 显示当前页面的转发按钮
    * @param {ShowShareMenuOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function showShareMenu(options: ShowShareMenuOptions): void;
 
   /**
    * 隐藏转发按钮
    * @param {BaseOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function hideShareMenu(options: BaseOptions): void;
 
   /**
    * 更新转发属性
    * @param {ShowShareMenuOptions} options
-   * @version 1.2.0
+   * @since 1.2.0
    */
   export function updateShareMenu(options: ShowShareMenuOptions): void;
 
@@ -3713,7 +2322,7 @@ declare namespace wx {
   /**
    * 获取转发详细信息
    * @param {GetShareInfoOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function getShareInfo(options: GetShareInfoOptions): void;
 
@@ -3755,7 +2364,7 @@ declare namespace wx {
   /**
    * 调起用户编辑收货地址原生界面，并在编辑完成后返回用户选择的地址。
    * @param {ChooseAddressOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function chooseAddress(options: ChooseAddressOptions): void;
 
@@ -3801,7 +2410,7 @@ declare namespace wx {
   /**
    * 批量添加卡券。
    * @param {AddCardOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function addCard(options: AddCardOptions): void;
 
@@ -3826,7 +2435,7 @@ declare namespace wx {
   /**
    * 查看微信卡包中的卡券。
    * @param {OpenCardOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function openCard(options: OpenCardOptions): void;
 
@@ -3845,14 +2454,14 @@ declare namespace wx {
   /**
    * 调起客户端小程序设置界面，返回用户设置的操作结果。
    * @param {SettingOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function openSetting(options: SettingOptions): void;
 
   /**
    * 获取用户的当前设置。
    * @param {SettingOptions} options
-   * @version 1.1.0
+   * @since 1.1.0
    */
   export function getSetting(options: SettingOptions): void;
 
@@ -3881,7 +2490,7 @@ declare namespace wx {
   /**
    * 打开同一公众号下关联的另一个小程序。
    * @param {NavigateToMiniProgramOptions} options
-   * @version 1.3.0
+   * @since 1.3.0
    */
   export function navigateToMiniProgram(
     options: NavigateToMiniProgramOptions
@@ -3897,7 +2506,7 @@ declare namespace wx {
   /**
    * 返回到上一个小程序，只有在当前小程序是被其他小程序打开时可以调用成功
    * @param {NavigateBackMiniProgramOptions} options
-   * @version 1.3.0
+   * @since 1.3.0
    */
   export function navigateBackMiniProgram(
     options: NavigateBackMiniProgramOptions
@@ -3949,7 +2558,7 @@ declare namespace wx {
   /**
    * 选择用户的发票抬头。
    * @param {ChooseInvoiceTitleOptions} options
-   * @version 1.5.0
+   * @since 1.5.0
    */
   export function chooseInvoiceTitle(options: ChooseInvoiceTitleOptions): void;
 }
