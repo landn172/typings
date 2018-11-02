@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "babel-node index.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/node": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "cheerio": "^1.0.0-rc.2",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
+    "semver": "^5.6.0"
+  }
+}
