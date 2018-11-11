@@ -1,3 +1,3 @@
-import { loadApiTreeAsync } from './src/index'
+import { start } from './src/index'
 
-loadApiTreeAsync()
+start()

@@ -15,21 +15,21 @@ export default class TreeNode {
     if (cacheLevel.has(this.level)) {
       return cacheLevel.get(this.level)
     }
-    const realLevel = Math.max(this.level.split('.').length - 3)
+    const realLevel = Math.max(this.level.split('.').length - 3, 0)
     cacheLevel.set(this.level, realLevel)
     return realLevel
   }
 
   get namespace() {
-    if (cacheNamespace.has(this.path)) {
-      return cacheNamespace.get(this.path)
+    if (cacheNamespace.has(this.level)) {
+      return cacheNamespace.get(this.level)
     }
 
     const realLevel = this.realLevel;
     // ./network/upload/wx.uploadFile.html => ['network','upload',...]
     const nsArr = splitPath(this.path)
     const ns = nsArr[realLevel] || ''
-    cacheNamespace.set(this.path, ns)
+    cacheNamespace.set(this.level, ns)
     return ns
   }
 
@@ -54,6 +54,7 @@ export default class TreeNode {
 
   walkTree(cb) {
     const children = this.children
+    cb(this)
     if (!children.length) return
     this.children.forEach(child => {
       child.walkTree(cb)
@@ -67,8 +68,8 @@ export default class TreeNode {
 
 function splitPath(path) {
   return path.replace('./', '')
-    .filter(s => !s.includes('.html'))
     .split('/')
+    .filter(s => !s.includes('.html'))
 }
 
 /**

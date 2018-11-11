@@ -1,7 +1,8 @@
 import { loadPageWithCheerioAsync } from './request'
 import TreeNode from './TreeNode';
+import { ENTRY_URL } from './const'
+import { collectTreeNodeTyping } from './collect'
 
-const ENTRY_URL = 'https://developers.weixin.qq.com/miniprogram/dev/api/'
 
 export async function loadApiTreeAsync() {
   const $ = await loadPageWithCheerioAsync(ENTRY_URL)
@@ -28,4 +29,15 @@ export async function loadApiTreeAsync() {
 
 export async function start() {
   const rootTree = await loadApiTreeAsync()
+  const tasks = new Set()
+  rootTree.walkTree((treeNode) => {
+    const task = async() => {
+      await collectTreeNodeTyping(treeNode)
+    }
+    tasks.add(task)
+  })
+
+  for (const task of tasks) {
+    await task()
+  }
 }
